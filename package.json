@@ -5,7 +5,8 @@
     "watch": "tsc --watch",
     "test": "node test/test.js",
     "test:only": "node --test-only test/test.js",
-    "format": "prettier --write lib/**/*.ts"
+    "format": "prettier --write lib/**/*.ts",
+    "prepare": "skooh"
   },
   "hooks": {
     "pre-commit": "npm run test"
