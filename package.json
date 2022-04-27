@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "node test/test.js",
+    "test:only": "node --test-only test/test.js",
+    "format": "prettier --write lib/**/*.ts"
+  },
+  "hooks": {
+    "pre-commit": "npm run test"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "dependencies": {
+    "mdast-util-to-string": "^3.1.0",
+    "mdast-util-toc": "^6.1.0",
+    "rehype-stringify": "^9.0.3",
+    "remark-gfm": "^3.0.1",
+    "remark-parse": "^10.0.1",
+    "remark-rehype": "^10.1.0",
+    "unified": "^10.1.2",
+    "unist-util-filter": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^3.0.10",
+    "@types/node": "^17.0.25",
+    "prettier": "^2.6.2",
+    "skooh": "^0.2.0",
+    "typescript": "^4.6.3"
+  }
+}
