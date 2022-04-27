@@ -9,7 +9,7 @@ export interface Metamark {
   metadata: Metadata
   md: string
   html: string
-  toc?: Toc
+  toc: Toc
 }
 
 export interface TocItem {
