@@ -9,7 +9,7 @@
     "prepare": "skooh"
   },
   "hooks": {
-    "pre-commit": "npm run test"
+    "pre-commit": "npm run test && npm run build"
   },
   "prettier": {
     "semi": false,
