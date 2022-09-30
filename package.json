@@ -2,11 +2,12 @@
   "name": "metamark",
   "type": "module",
   "version": "0.1.1",
+  "main": "dist/index.js",
   "scripts": {
     "ppp": "npm version patch && git push && npm publish",
     "build": "tsc",
     "watch": "tsc --watch",
-    "format": "prettier --write .",
+    "format": "prettier --write lib",
     "prepare": "skooh"
   },
   "devDependencies": {
