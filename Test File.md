@@ -1,5 +1,9 @@
 ---
 public: true
+tags:
+  - markdown
+  - yaml
+  - html
 ---
 
 # Hello
