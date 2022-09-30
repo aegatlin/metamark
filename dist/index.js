@@ -14,15 +14,16 @@ import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 export function metamark(filePath) {
     const { base, name, ext } = path.parse(filePath);
     const rawMd = readFileSync(filePath, 'utf8');
     const { data: frontmatter, content: md } = matter(rawMd);
-    const mdast = getMdastFromMd(md);
-    const hast = getHastFromMd(md);
-    const html = getHtmlFromMd(md);
+    const mdast = getMdastProcessor().parse(md);
+    const hast = getHastProcessor().parse(md);
+    const html = getHastProcessor().processSync(md).toString();
     return {
         file: { name, ext, base },
         title: name,
@@ -52,32 +53,14 @@ function getTocFromHtml(html) {
     });
     return flatToc;
 }
-function getMdastFromMd(md) {
-    const mdastProcessor = unified().use(remarkParse).use(remarkGfm);
-    const mdast = mdastProcessor.parse(md);
-    return mdast;
+function getMdastProcessor() {
+    return unified().use(remarkParse).use(remarkGfm).use(remarkWikiLinksToLinks);
 }
-function getHastFromMd(md) {
-    const hastProcessor = unified()
-        .use(remarkParse)
-        .use(remarkGfm)
-        .use(remarkRehype)
-        .use(rehypeSlug)
-        .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
-        .use(rehypeHighlight, { languages: { elixir } });
-    const hast = hastProcessor.parse(md);
-    return hast;
-}
-function getHtmlFromMd(md) {
-    const html = unified()
-        .use(remarkParse)
-        .use(remarkGfm)
+function getHastProcessor() {
+    return getMdastProcessor()
         .use(remarkRehype)
         .use(rehypeSlug)
         .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
         .use(rehypeHighlight, { languages: { elixir } })
-        .use(rehypeStringify)
-        .processSync(md)
-        .toString();
-    return html;
+        .use(rehypeStringify);
 }
