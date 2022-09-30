@@ -25,17 +25,20 @@ export function metamarkDir(dirPath) {
 
   dirEntries.forEach((dirEntry) => {
     if (dirEntry.isFile()) {
-      const rawMd = readFileSync(path.join(dirPath, dirEntry.name), 'utf8')
+      const fileName = dirEntry.name
+
+      const rawMd = readFileSync(path.join(dirPath, fileName), 'utf8')
       const { data: frontmatter } = matter(rawMd)
       if (frontmatter?.public) {
-        whitelist.push(slugify(dirEntry.name))
+        whitelist.push(slugify(fileName))
       }
     }
   })
 
   const toUri = (name) => {
-    const slug = `${slugify(name)}-md`
-    if (whitelist.includes(slug)) {
+    const slug = slugify(name)
+    const fileNameSlug = `${slug}-md`
+    if (whitelist.includes(fileNameSlug)) {
       return `./${slug}`
     } else return false
   }
@@ -47,7 +50,7 @@ export function metamarkDir(dirPath) {
       const fileName = dirEntry.name
       const fileNameSlug = slugify(fileName)
       if (whitelist.includes(fileNameSlug)) {
-        metamarks.push(metamark(dirEntry.name, { toUri }))
+        metamarks.push(metamark(path.join(dirPath, fileName), { toUri }))
       }
     }
   })
