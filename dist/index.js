@@ -20,15 +20,9 @@ export function metamark(filePath) {
     const { base, name, ext } = path.parse(filePath);
     const rawMd = readFileSync(filePath, 'utf8');
     const { data: frontmatter, content: md } = matter(rawMd);
-    const mdastProcessor = unified().use(remarkParse).use(remarkGfm);
-    const mdast = mdastProcessor.parse(md);
-    const hastProcessor = mdastProcessor()
-        .use(remarkRehype)
-        .use(rehypeSlug)
-        .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
-        .use(rehypeHighlight, { languages: { elixir } });
-    const hast = hastProcessor.parse(md);
-    const html = hastProcessor().use(rehypeStringify).processSync(md).toString();
+    const mdast = getMdastFromMd(md);
+    const hast = getHastFromMd(md);
+    const html = getHtmlFromMd(md);
     return {
         file: { name, ext, base },
         title: name,
@@ -57,4 +51,33 @@ function getTocFromHtml(html) {
         });
     });
     return flatToc;
+}
+function getMdastFromMd(md) {
+    const mdastProcessor = unified().use(remarkParse).use(remarkGfm);
+    const mdast = mdastProcessor.parse(md);
+    return mdast;
+}
+function getHastFromMd(md) {
+    const hastProcessor = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkRehype)
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
+        .use(rehypeHighlight, { languages: { elixir } });
+    const hast = hastProcessor.parse(md);
+    return hast;
+}
+function getHtmlFromMd(md) {
+    const html = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkRehype)
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
+        .use(rehypeHighlight, { languages: { elixir } })
+        .use(rehypeStringify)
+        .processSync(md)
+        .toString();
+    return html;
 }
