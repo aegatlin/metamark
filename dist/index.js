@@ -37,11 +37,17 @@ export function metamarkDir(dirPath) {
         else
             return false;
     };
+    const metamarks = [];
     dirEntries.forEach((dirEntry) => {
         if (dirEntry.isFile()) {
-            metamark(dirEntry.name, { toUri });
+            const fileName = dirEntry.name;
+            const fileNameSlug = slugify(fileName);
+            if (whitelist.includes(fileNameSlug)) {
+                metamarks.push(metamark(dirEntry.name, { toUri }));
+            }
         }
     });
+    return metamarks;
 }
 export function metamark(filePath, opts) {
     const toUri = opts.toUri || (() => false);
