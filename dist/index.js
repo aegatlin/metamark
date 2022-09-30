@@ -1,5 +1,5 @@
 import slugify from '@sindresorhus/slugify';
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import matter from 'gray-matter';
 import { fromHtml } from 'hast-util-from-html';
 import { heading } from 'hast-util-heading';
@@ -17,13 +17,40 @@ import remarkRehype from 'remark-rehype';
 import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-export function metamark(filePath) {
+export function metamarkDir(dirPath) {
+    const dirEntries = readdirSync(dirPath, { withFileTypes: true });
+    const whitelist = [];
+    dirEntries.forEach((dirEntry) => {
+        if (dirEntry.isFile()) {
+            const rawMd = readFileSync(path.join(dirPath, dirEntry.name), 'utf8');
+            const { data: frontmatter } = matter(rawMd);
+            if (frontmatter === null || frontmatter === void 0 ? void 0 : frontmatter.public) {
+                whitelist.push(slugify(dirEntry.name));
+            }
+        }
+    });
+    const toUri = (name) => {
+        const slug = `${slugify(name)}-md`;
+        if (whitelist.includes(slug)) {
+            return `./${slug}`;
+        }
+        else
+            return false;
+    };
+    dirEntries.forEach((dirEntry) => {
+        if (dirEntry.isFile()) {
+            metamark(dirEntry.name, { toUri });
+        }
+    });
+}
+export function metamark(filePath, opts) {
+    const toUri = opts.toUri || (() => false);
     const { base, name, ext } = path.parse(filePath);
     const rawMd = readFileSync(filePath, 'utf8');
     const { data: frontmatter, content: md } = matter(rawMd);
-    const mdast = getMdastProcessor().parse(md);
-    const hast = getHastProcessor().parse(md);
-    const html = getHastProcessor().processSync(md).toString();
+    const mdast = getMdastProcessor({ toUri }).parse(md);
+    const hast = getHastProcessor({ toUri }).parse(md);
+    const html = getHastProcessor({ toUri }).processSync(md).toString();
     return {
         file: { name, ext, base },
         title: name,
@@ -53,14 +80,14 @@ function getTocFromHtml(html) {
     });
     return flatToc;
 }
-function getMdastProcessor() {
+function getMdastProcessor({ toUri }) {
     return unified()
         .use(remarkParse)
         .use(remarkGfm)
-        .use(remarkWikiLinksToLinks, { toUri: (name) => `./${slugify(name)}` });
+        .use(remarkWikiLinksToLinks, { toUri });
 }
-function getHastProcessor() {
-    return getMdastProcessor()
+function getHastProcessor({ toUri }) {
+    return getMdastProcessor({ toUri })
         .use(remarkRehype)
         .use(rehypeSlug)
         .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
