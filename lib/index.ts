@@ -64,7 +64,10 @@ function getTocFromHtml(html) {
 }
 
 function getMdastProcessor() {
-  return unified().use(remarkParse).use(remarkGfm).use(remarkWikiLinksToLinks)
+  return unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkWikiLinksToLinks, { toUri: (name) => `./${slugify(name)}` })
 }
 
 function getHastProcessor() {
