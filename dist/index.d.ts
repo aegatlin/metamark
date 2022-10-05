@@ -1,12 +1,12 @@
-interface TocItem {
+export interface MetamarkTocItem {
     title: string;
     depth: number;
     id: string;
 }
-interface Metamark {
+export interface Metamark {
     slug: string;
     route: string;
-    toc: TocItem[];
+    toc: MetamarkTocItem[];
     firstParagraphText: string;
     title: string;
     frontmatter: any;
@@ -14,5 +14,9 @@ interface Metamark {
         html: string;
     };
 }
-export declare function metamark(filePath: string): Metamark;
+declare type Opts = {
+    toSlug?: (title: string) => string;
+    toRoute?: (title: string) => string;
+};
+export declare function metamark(filePath: string, { toSlug, toRoute }?: Opts): Metamark;
 export {};

@@ -17,7 +17,13 @@ import remarkRehype from 'remark-rehype';
 import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
-export function metamark(filePath) {
+let _toSlug = (title) => slugify(title);
+let _toRoute = (title) => `/content/${_toSlug(title)}`;
+export function metamark(filePath, { toSlug, toRoute } = {}) {
+    if (toSlug)
+        _toSlug = toSlug;
+    if (toRoute)
+        _toRoute = toRoute;
     const { name: title } = path.parse(filePath);
     const content = readFileSync(filePath, 'utf8');
     const { data: frontmatter, content: md } = matter(content);
@@ -25,19 +31,13 @@ export function metamark(filePath) {
     const html = getHtml(md);
     return {
         title,
-        slug: toSlug(title),
-        route: toRoute(title),
+        slug: _toSlug(title),
+        route: _toRoute(title),
         frontmatter,
         firstParagraphText: getFirstParagraphText(mdast),
         toc: getTocFromHtml(html),
         content: { html },
     };
-}
-function toSlug(title) {
-    return slugify(title);
-}
-function toRoute(title) {
-    return `/content/${toSlug(title)}`;
 }
 function getFirstParagraphText(mdast) {
     const firstParagraph = mdast.children.find((child) => child.type === 'paragraph');
@@ -71,7 +71,7 @@ function getMdastProcessor() {
         .use(remarkParse)
         .use(remarkGfm)
         .use(remarkWikiLinksToLinks, {
-        toUri: (name) => toRoute(name),
+        toUri: (name) => _toRoute(name),
     });
 }
 function getHastProcessor() {

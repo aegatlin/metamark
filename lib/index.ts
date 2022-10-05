@@ -18,23 +18,37 @@ import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
-interface TocItem {
+export interface MetamarkTocItem {
   title: string
   depth: number
   id: string
 }
 
-interface Metamark {
+export interface Metamark {
   slug: string
   route: string
-  toc: TocItem[]
+  toc: MetamarkTocItem[]
   firstParagraphText: string
   title: string
   frontmatter: any
   content: { html: string }
 }
 
-export function metamark(filePath: string): Metamark {
+type Opts = {
+  toSlug?: (title: string) => string
+  toRoute?: (title: string) => string
+}
+
+let _toSlug = (title: string) => slugify(title)
+let _toRoute = (title: string) => `/content/${_toSlug(title)}`
+
+export function metamark(
+  filePath: string,
+  { toSlug, toRoute }: Opts = {}
+): Metamark {
+  if (toSlug) _toSlug = toSlug
+  if (toRoute) _toRoute = toRoute
+
   const { name: title } = path.parse(filePath)
   const content = readFileSync(filePath, 'utf8')
   const { data: frontmatter, content: md } = matter(content)
@@ -43,21 +57,13 @@ export function metamark(filePath: string): Metamark {
 
   return {
     title,
-    slug: toSlug(title),
-    route: toRoute(title),
+    slug: _toSlug(title),
+    route: _toRoute(title),
     frontmatter,
     firstParagraphText: getFirstParagraphText(mdast),
     toc: getTocFromHtml(html),
     content: { html },
   }
-}
-
-function toSlug(title: string) {
-  return slugify(title)
-}
-
-function toRoute(title: string) {
-  return `/content/${toSlug(title)}`
 }
 
 function getFirstParagraphText(mdast) {
@@ -67,10 +73,10 @@ function getFirstParagraphText(mdast) {
   return toString(firstParagraph)
 }
 
-function getTocFromHtml(html): TocItem[] {
+function getTocFromHtml(html): MetamarkTocItem[] {
   const hast = fromHtml(html)
 
-  const flatToc: TocItem[] = []
+  const flatToc: MetamarkTocItem[] = []
 
   visit(hast, heading, (node) => {
     const tagName = node?.tagName
@@ -100,7 +106,7 @@ function getMdastProcessor() {
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkWikiLinksToLinks, {
-      toUri: (name) => toRoute(name),
+      toUri: (name) => _toRoute(name),
     })
 }
 

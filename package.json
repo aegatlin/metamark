@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "format": "prettier --write lib",
-    "prepare": "skooh"
+    "prepare": "skooh",
+    "test": "node --test"
   },
   "devDependencies": {
     "@types/hast": "^2.3.4",
