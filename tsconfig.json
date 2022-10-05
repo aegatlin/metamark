@@ -3,7 +3,8 @@
     "outDir": "dist",
     "target": "ES6",
     "module": "node16",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true
   },
   "include": ["lib/**/*"]
 }

@@ -1,5 +1,5 @@
 import slugify from '@sindresorhus/slugify'
-import { readdirSync, readFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import matter from 'gray-matter'
 import { fromHtml } from 'hast-util-from-html'
 import { heading } from 'hast-util-heading'
@@ -18,67 +18,38 @@ import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links'
 import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
-export function metamarkDir(dirPath) {
-  const dirEntries = readdirSync(dirPath, { withFileTypes: true })
-
-  const whitelist = []
-
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const fileName = dirEntry.name
-
-      const rawMd = readFileSync(path.join(dirPath, fileName), 'utf8')
-      const { data: frontmatter } = matter(rawMd)
-      if (frontmatter?.public) {
-        whitelist.push(slugify(fileName))
-      }
-    }
-  })
-
-  const toUri = (name) => {
-    const slug = slugify(name)
-    const fileNameSlug = `${slug}-md`
-    if (whitelist.includes(fileNameSlug)) {
-      return `./${slug}`
-    } else return false
-  }
-
-  const metamarks = []
-
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const fileName = dirEntry.name
-      const fileNameSlug = slugify(fileName)
-      if (whitelist.includes(fileNameSlug)) {
-        metamarks.push(metamark(path.join(dirPath, fileName), { toUri }))
-      }
-    }
-  })
-
-  return metamarks
+interface TocItem {
+  title: string
+  depth: number
+  id: string
 }
 
-export function metamark(
-  filePath: string,
-  opts: { toUri: (s: string) => string | boolean }
-) {
-  const toUri = opts.toUri || (() => false)
-  const { base, name, ext } = path.parse(filePath)
-  const rawMd = readFileSync(filePath, 'utf8')
-  const { data: frontmatter, content: md } = matter(rawMd)
+interface Metamark {
+  slug: string
+  route: string
+  toc: TocItem[]
+  firstParagraphText: string
+  title: string
+  frontmatter: any
+  content: { html: string }
+}
 
-  const mdast = getMdastProcessor({ toUri }).parse(md)
-  const hast = getHastProcessor({ toUri }).parse(md)
-  const html = getHastProcessor({ toUri }).processSync(md).toString()
+export function metamark(filePath: string): Metamark {
+  const { name: title } = path.parse(filePath)
+  const content = readFileSync(filePath, 'utf8')
+  const { data: frontmatter, content: md } = matter(content)
+  const slug = slugify(title)
+  const mdast = getMdast(md)
+  const html = getHtml(md)
 
   return {
-    file: { name, ext, base },
-    title: name,
-    slug: slugify(name),
+    title,
+    slug,
+    route: `/content/${slug}`,
     frontmatter,
     firstParagraphText: getFirstParagraphText(mdast),
     toc: getTocFromHtml(html),
-    content: { rawMd, md, mdast, hast, html },
+    content: { html },
   }
 }
 
@@ -89,16 +60,15 @@ function getFirstParagraphText(mdast) {
   return toString(firstParagraph)
 }
 
-function getTocFromHtml(html) {
+function getTocFromHtml(html): TocItem[] {
   const hast = fromHtml(html)
 
-  const flatToc = []
+  const flatToc: TocItem[] = []
 
   visit(hast, heading, (node) => {
     const tagName = node?.tagName
     flatToc.push({
       title: toText(node),
-      tagName,
       depth: parseInt(tagName?.at(1)) || -1,
       id: node?.properties?.id,
     })
@@ -107,15 +77,23 @@ function getTocFromHtml(html) {
   return flatToc
 }
 
-function getMdastProcessor({ toUri }) {
-  return unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkWikiLinksToLinks, { toUri })
+function getMdast(md: string) {
+  const processor = getMdastProcessor()
+  const mdast = processor.parse(md)
+  return processor.runSync(mdast)
 }
 
-function getHastProcessor({ toUri }) {
-  return getMdastProcessor({ toUri })
+function getHtml(md: string) {
+  const processor = getHastProcessor()
+  return processor.processSync(md).toString()
+}
+
+function getMdastProcessor() {
+  return unified().use(remarkParse).use(remarkGfm).use(remarkWikiLinksToLinks)
+}
+
+function getHastProcessor() {
+  return getMdastProcessor()
     .use(remarkRehype)
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
