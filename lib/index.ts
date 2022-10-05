@@ -38,19 +38,26 @@ export function metamark(filePath: string): Metamark {
   const { name: title } = path.parse(filePath)
   const content = readFileSync(filePath, 'utf8')
   const { data: frontmatter, content: md } = matter(content)
-  const slug = slugify(title)
   const mdast = getMdast(md)
   const html = getHtml(md)
 
   return {
     title,
-    slug,
-    route: `/content/${slug}`,
+    slug: toSlug(title),
+    route: toRoute(title),
     frontmatter,
     firstParagraphText: getFirstParagraphText(mdast),
     toc: getTocFromHtml(html),
     content: { html },
   }
+}
+
+function toSlug(title: string) {
+  return slugify(title)
+}
+
+function toRoute(title: string) {
+  return `/content/${toSlug(title)}`
 }
 
 function getFirstParagraphText(mdast) {
@@ -89,7 +96,12 @@ function getHtml(md: string) {
 }
 
 function getMdastProcessor() {
-  return unified().use(remarkParse).use(remarkGfm).use(remarkWikiLinksToLinks)
+  return unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkWikiLinksToLinks, {
+      toUri: (name) => toRoute(name),
+    })
 }
 
 function getHastProcessor() {
