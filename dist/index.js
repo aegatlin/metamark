@@ -12,9 +12,9 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import rehypeStringify from 'rehype-stringify';
 import remarkGfm from 'remark-gfm';
+import { remarkObsidianLink } from 'remark-obsidian-link';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
-import { remarkWikiLinksToLinks } from 'remark-wiki-links-to-links';
 import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 let _toSlug = (title) => slugify(title);
@@ -70,9 +70,7 @@ function getMdastProcessor() {
     return unified()
         .use(remarkParse)
         .use(remarkGfm)
-        .use(remarkWikiLinksToLinks, {
-        toUri: (name) => _toRoute(name),
-    });
+        .use(remarkObsidianLink, { toUri: (s) => _toRoute(s) });
 }
 function getHastProcessor() {
     return getMdastProcessor()

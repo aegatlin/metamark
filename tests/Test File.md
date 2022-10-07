@@ -10,6 +10,8 @@ tags:
 
 I am a markdown file!
 
+This is a [[Wiki Link]].
+
 ## More
 
 And a very good one, too!

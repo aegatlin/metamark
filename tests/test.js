@@ -18,6 +18,10 @@ describe('defaults', () => {
       { title: 'Hello', id: 'hello', depth: 1 },
       { title: 'More', id: 'more', depth: 2 },
     ])
+    assert.match(
+      actual.content.html,
+      /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
+    )
   })
 })
 
@@ -40,5 +44,9 @@ describe('custom slug and route', () => {
       { title: 'Hello', id: 'hello', depth: 1 },
       { title: 'More', id: 'more', depth: 2 },
     ])
+    assert.match(
+      actual.content.html,
+      /<a href="\/really\/odd" title="">Wiki Link<\/a>/g
+    )
   })
 })
