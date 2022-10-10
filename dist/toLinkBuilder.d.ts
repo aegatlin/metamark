@@ -1,11 +1,3 @@
-export interface WikiLink {
-    value: string;
-    alias?: string;
-}
-export interface Link {
-    value: string;
-    uri: string;
-    title?: string;
-}
+import { WikiLink, Link } from 'remark-obsidian-link';
 export declare type ToLink = (wikiLink: WikiLink) => Link | string;
 export declare function toLinkBuilder(pageAllowSet: Set<string>): ToLink;

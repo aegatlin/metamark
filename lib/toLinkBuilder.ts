@@ -4,17 +4,7 @@ import {
   obsidianLinkBuilder as wikiLinkToObLink,
   ObsidianLinkType,
 } from './obsidianLinkBuilder.js'
-
-export interface WikiLink {
-  value: string
-  alias?: string
-}
-
-export interface Link {
-  value: string
-  uri: string
-  title?: string
-}
+import { WikiLink, Link } from 'remark-obsidian-link'
 
 export type ToLink = (wikiLink: WikiLink) => Link | string
 type ToUri = (x: { page?: string; header?: string }) => string

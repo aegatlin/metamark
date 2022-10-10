@@ -1,4 +1,4 @@
-import { WikiLink } from './toLinkBuilder.js'
+import { WikiLink } from 'remark-obsidian-link'
 
 export enum ObsidianLinkType {
   Page = 'page',
