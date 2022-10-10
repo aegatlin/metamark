@@ -15,7 +15,7 @@ import remarkGfm from 'remark-gfm'
 import { remarkObsidianLink } from 'remark-obsidian-link'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
-import { unified } from 'unified'
+import { Preset, unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
 export interface MetamarkTocItem {
@@ -24,56 +24,38 @@ export interface MetamarkTocItem {
   id: string
 }
 
-export interface Metamark {
-  slug: string
-  route: string
-  toc: MetamarkTocItem[]
-  firstParagraphText: string
-  title: string
-  frontmatter: any
-  content: { html: string }
+const preset: Preset = {
+  plugins: [
+    remarkParse,
+    remarkGfm,
+    remarkObsidianLink,
+    remarkRehype,
+    rehypeSlug,
+    [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+    [rehypeHighlight, { languages: { elixir } }],
+    rehypeStringify,
+  ],
 }
 
-type Opts = {
-  toSlug?: (title: string) => string
-  toRoute?: (title: string) => string
+function getFrontmatter(rawMd: string): { [key: string]: any } {
+  const { data: frontmatter } = matter(rawMd)
+  return frontmatter
 }
 
-let _toSlug = (title: string) => slugify(title)
-let _toRoute = (title: string) => `/content/${_toSlug(title)}`
+function getFirstParagraphText(md: string): string {
+  const mdast = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkObsidianLink)
+    .parse(md)
 
-export function metamark(
-  filePath: string,
-  { toSlug, toRoute }: Opts = {}
-): Metamark {
-  if (toSlug) _toSlug = toSlug
-  if (toRoute) _toRoute = toRoute
-
-  const { name: title } = path.parse(filePath)
-  const content = readFileSync(filePath, 'utf8')
-  const { data: frontmatter, content: md } = matter(content)
-  const mdast = getMdast(md)
-  const html = getHtml(md)
-
-  return {
-    title,
-    slug: _toSlug(title),
-    route: _toRoute(title),
-    frontmatter,
-    firstParagraphText: getFirstParagraphText(mdast),
-    toc: getTocFromHtml(html),
-    content: { html },
-  }
-}
-
-function getFirstParagraphText(mdast) {
   const firstParagraph = mdast.children.find(
     (child) => child.type === 'paragraph'
   )
   return toString(firstParagraph)
 }
 
-function getTocFromHtml(html): MetamarkTocItem[] {
+function getTocData(html: string): MetamarkTocItem[] {
   const hast = fromHtml(html)
 
   const flatToc: MetamarkTocItem[] = []
@@ -90,29 +72,61 @@ function getTocFromHtml(html): MetamarkTocItem[] {
   return flatToc
 }
 
-function getMdast(md: string) {
-  const processor = getMdastProcessor()
-  const mdast = processor.parse(md)
-  return processor.runSync(mdast)
+function toHtml(md: string): string {
+  return unified().use(preset).processSync(md).toString()
 }
 
-function getHtml(md: string) {
-  const processor = getHastProcessor()
-  return processor.processSync(md).toString()
+function toTitle(filePath: string): string {
+  const { name: title } = path.parse(filePath)
+  return title
 }
 
-function getMdastProcessor() {
-  return unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkObsidianLink, { toUri: (s) => _toRoute(s) })
+function toSlug(title: string): string {
+  return slugify(title)
 }
 
-function getHastProcessor() {
-  return getMdastProcessor()
-    .use(remarkRehype)
-    .use(rehypeSlug)
-    .use(rehypeAutolinkHeadings, { behavior: 'wrap' })
-    .use(rehypeHighlight, { languages: { elixir } })
-    .use(rehypeStringify)
+function getRawMd(filePath: string): string {
+  return readFileSync(filePath, 'utf8')
+}
+
+function getMdNoFrontmatter(rawMd: string): string {
+  const { content: md } = matter(rawMd)
+  return md
+}
+
+function all(filePath: string): {
+  title: string
+  slug: string
+  toc: MetamarkTocItem[]
+  firstParagraphText: string
+  frontmatter: { [key: string]: any }
+  html: string
+} {
+  const rawMd = getRawMd(filePath)
+  const md = getMdNoFrontmatter(rawMd)
+  const html = toHtml(md)
+
+  const title = toTitle(filePath)
+
+  return {
+    title,
+    slug: toSlug(title),
+    toc: getTocData(html),
+    firstParagraphText: getFirstParagraphText(md),
+    frontmatter: getFrontmatter(rawMd),
+    html: toHtml(md),
+  }
+}
+
+export const Metamark = {
+  preset,
+  getRawMd,
+  getMdNoFrontmatter,
+  getTocData,
+  getFirstParagraphText,
+  getFrontmatter,
+  toHtml,
+  toTitle,
+  toSlug,
+  all,
 }

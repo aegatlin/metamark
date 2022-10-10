@@ -1,14 +1,14 @@
 import assert from 'assert/strict'
 import { describe, it } from 'node:test'
-import { metamark } from '../dist/index.js'
+import { Metamark } from '../dist/index.js'
+import { unified } from 'unified'
 
-describe('defaults', () => {
-  it('works', () => {
-    const actual = metamark('./tests/Test File.md')
+describe('Metamark.all', () => {
+  it('works with defaults', () => {
+    const actual = Metamark.all('./tests/Test File.md')
 
     assert.deepEqual(actual.title, 'Test File')
     assert.deepEqual(actual.slug, 'test-file')
-    assert.deepEqual(actual.route, '/content/test-file')
     assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
     assert.deepEqual(actual.frontmatter, {
       public: true,
@@ -19,34 +19,19 @@ describe('defaults', () => {
       { title: 'More', id: 'more', depth: 2 },
     ])
     assert.match(
-      actual.content.html,
+      actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
     )
   })
 })
 
-describe('custom slug and route', () => {
+describe('preset', () => {
   it('works', () => {
-    const actual = metamark('./tests/Test File.md', {
-      toSlug: (title) => 'random',
-      toRoute: (title) => '/really/odd',
-    })
-
-    assert.deepEqual(actual.title, 'Test File')
-    assert.deepEqual(actual.slug, 'random')
-    assert.deepEqual(actual.route, '/really/odd')
-    assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
-    assert.deepEqual(actual.frontmatter, {
-      public: true,
-      tags: ['markdown', 'yaml', 'html'],
-    })
-    assert.deepEqual(actual.toc, [
-      { title: 'Hello', id: 'hello', depth: 1 },
-      { title: 'More', id: 'more', depth: 2 },
-    ])
-    assert.match(
-      actual.content.html,
-      /<a href="\/really\/odd" title="">Wiki Link<\/a>/g
-    )
+    const actual = unified()
+      .use(Metamark.preset)
+      .processSync('# Hello')
+      .toString()
+    const expected = '<h1 id="hello"><a href="#hello">Hello</a></h1>'
+    assert.deepEqual(actual, expected)
   })
 })

@@ -1,22 +1,39 @@
+import { Preset } from 'unified';
 export interface MetamarkTocItem {
     title: string;
     depth: number;
     id: string;
 }
-export interface Metamark {
+declare function getFrontmatter(rawMd: string): {
+    [key: string]: any;
+};
+declare function getFirstParagraphText(md: string): string;
+declare function getTocData(html: string): MetamarkTocItem[];
+declare function toHtml(md: string): string;
+declare function toTitle(filePath: string): string;
+declare function toSlug(title: string): string;
+declare function getRawMd(filePath: string): string;
+declare function getMdNoFrontmatter(rawMd: string): string;
+declare function all(filePath: string): {
+    title: string;
     slug: string;
-    route: string;
     toc: MetamarkTocItem[];
     firstParagraphText: string;
-    title: string;
-    frontmatter: any;
-    content: {
-        html: string;
+    frontmatter: {
+        [key: string]: any;
     };
-}
-declare type Opts = {
-    toSlug?: (title: string) => string;
-    toRoute?: (title: string) => string;
+    html: string;
 };
-export declare function metamark(filePath: string, { toSlug, toRoute }?: Opts): Metamark;
+export declare const Metamark: {
+    preset: Preset;
+    getRawMd: typeof getRawMd;
+    getMdNoFrontmatter: typeof getMdNoFrontmatter;
+    getTocData: typeof getTocData;
+    getFirstParagraphText: typeof getFirstParagraphText;
+    getFrontmatter: typeof getFrontmatter;
+    toHtml: typeof toHtml;
+    toTitle: typeof toTitle;
+    toSlug: typeof toSlug;
+    all: typeof all;
+};
 export {};
