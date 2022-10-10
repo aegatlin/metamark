@@ -1,11 +1,12 @@
 import assert from 'assert/strict'
 import { describe, it } from 'node:test'
 import { Metamark } from '../dist/index.js'
-import { unified } from 'unified'
 
 describe('Metamark.all', () => {
   it('works with defaults', () => {
-    const actual = Metamark.all('./tests/Test File.md')
+    const pageAllowSet = new Set()
+    pageAllowSet.add('Wiki Link')
+    const actual = Metamark.all('./tests/Test File.md', pageAllowSet)
 
     assert.deepEqual(actual.title, 'Test File')
     assert.deepEqual(actual.slug, 'test-file')
@@ -22,16 +23,5 @@ describe('Metamark.all', () => {
       actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
     )
-  })
-})
-
-describe('preset', () => {
-  it('works', () => {
-    const actual = unified()
-      .use(Metamark.preset)
-      .processSync('# Hello')
-      .toString()
-    const expected = '<h1 id="hello"><a href="#hello">Hello</a></h1>'
-    assert.deepEqual(actual, expected)
   })
 })

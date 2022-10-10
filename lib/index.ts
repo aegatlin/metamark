@@ -1,41 +1,15 @@
-import slugify from '@sindresorhus/slugify'
 import { readFileSync } from 'fs'
 import matter from 'gray-matter'
-import { fromHtml } from 'hast-util-from-html'
-import { heading } from 'hast-util-heading'
-import { toText } from 'hast-util-to-text'
-import elixir from 'highlight.js/lib/languages/elixir'
 import { toString } from 'mdast-util-to-string'
 import path from 'path'
-import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypeHighlight from 'rehype-highlight'
-import rehypeSlug from 'rehype-slug'
-import rehypeStringify from 'rehype-stringify'
 import remarkGfm from 'remark-gfm'
 import { remarkObsidianLink } from 'remark-obsidian-link'
 import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
 import { Preset, unified } from 'unified'
-import { visit } from 'unist-util-visit'
-
-export interface MetamarkTocItem {
-  title: string
-  depth: number
-  id: string
-}
-
-const preset: Preset = {
-  plugins: [
-    remarkParse,
-    remarkGfm,
-    remarkObsidianLink,
-    remarkRehype,
-    rehypeSlug,
-    [rehypeAutolinkHeadings, { behavior: 'wrap' }],
-    [rehypeHighlight, { languages: { elixir } }],
-    rehypeStringify,
-  ],
-}
+import { getSlug } from './getSlug.js'
+import { getTocData, MetamarkTocItem } from './getTocData.js'
+import { preset, presetBuilder } from './presets.js'
+import { toLinkBuilder } from './toLinkBuilder.js'
 
 function getFrontmatter(rawMd: string): { [key: string]: any } {
   const { data: frontmatter } = matter(rawMd)
@@ -46,7 +20,7 @@ function getFirstParagraphText(md: string): string {
   const mdast = unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkObsidianLink)
+    .use(remarkObsidianLink, { toLink: () => '' }) // turn off links
     .parse(md)
 
   const firstParagraph = mdast.children.find(
@@ -55,34 +29,13 @@ function getFirstParagraphText(md: string): string {
   return toString(firstParagraph)
 }
 
-function getTocData(html: string): MetamarkTocItem[] {
-  const hast = fromHtml(html)
-
-  const flatToc: MetamarkTocItem[] = []
-
-  visit(hast, heading, (node) => {
-    const tagName = node?.tagName
-    flatToc.push({
-      title: toText(node),
-      depth: parseInt(tagName?.at(1)) || -1,
-      id: node?.properties?.id,
-    })
-  })
-
-  return flatToc
-}
-
-function toHtml(md: string): string {
+function toHtml(md: string, preset: Preset): string {
   return unified().use(preset).processSync(md).toString()
 }
 
-function toTitle(filePath: string): string {
+function getTitle(filePath: string): string {
   const { name: title } = path.parse(filePath)
   return title
-}
-
-function toSlug(title: string): string {
-  return slugify(title)
 }
 
 function getRawMd(filePath: string): string {
@@ -94,7 +47,10 @@ function getMdNoFrontmatter(rawMd: string): string {
   return md
 }
 
-function all(filePath: string): {
+function all(
+  filePath: string,
+  pageAllowSet: Set<string>
+): {
   title: string
   slug: string
   toc: MetamarkTocItem[]
@@ -103,30 +59,31 @@ function all(filePath: string): {
   html: string
 } {
   const rawMd = getRawMd(filePath)
+  const title = getTitle(filePath)
   const md = getMdNoFrontmatter(rawMd)
-  const html = toHtml(md)
-
-  const title = toTitle(filePath)
+  const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet) })
+  const html = toHtml(md, preset)
 
   return {
     title,
-    slug: toSlug(title),
+    slug: getSlug(title),
     toc: getTocData(html),
     firstParagraphText: getFirstParagraphText(md),
     frontmatter: getFrontmatter(rawMd),
-    html: toHtml(md),
+    html,
   }
 }
 
 export const Metamark = {
-  preset,
-  getRawMd,
-  getMdNoFrontmatter,
-  getTocData,
+  all,
   getFirstParagraphText,
   getFrontmatter,
+  getMdNoFrontmatter,
+  getRawMd,
+  getSlug,
+  getTitle,
+  getTocData,
+  preset,
+  presetBuilder,
   toHtml,
-  toTitle,
-  toSlug,
-  all,
 }

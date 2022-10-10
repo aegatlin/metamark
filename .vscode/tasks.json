@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "all",
+      "type": "shell",
+      "command": "npm run test"
+    },
+    {
+      "label": "file",
+      "type": "shell",
+      "command": "npm run test -- ${file}",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      }
+    },
+    {
+      "label": "line",
+      "type": "shell",
+      "command": "npm run test -- ${file}:${lineNumber}",
+      "runOptions": {
+        "reevaluateOnRerun": false
+      }
+    }
+  ]
+}
