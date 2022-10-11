@@ -1,1 +1,1 @@
-export declare function getSlug(title: string): string;
+export declare function getSlug(s: string): string;

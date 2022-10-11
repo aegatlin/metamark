@@ -33,9 +33,9 @@ function toHtml(md: string, preset: Preset): string {
   return unified().use(preset).processSync(md).toString()
 }
 
-function getTitle(filePath: string): string {
-  const { name: title } = path.parse(filePath)
-  return title
+function getPage(filePath: string): string {
+  const { name: page } = path.parse(filePath)
+  return page
 }
 
 function getRawMd(filePath: string): string {
@@ -47,26 +47,25 @@ function getMdNoFrontmatter(rawMd: string): string {
   return md
 }
 
-function all(
-  filePath: string,
-  pageAllowSet: Set<string>
-): {
-  title: string
+export interface Mark {
+  page: string
   slug: string
   toc: MetamarkTocItem[]
   firstParagraphText: string
   frontmatter: { [key: string]: any }
   html: string
-} {
+}
+
+function getMark(filePath: string, pageAllowSet: Set<string>): Mark {
   const rawMd = getRawMd(filePath)
-  const title = getTitle(filePath)
+  const page = getPage(filePath)
   const md = getMdNoFrontmatter(rawMd)
   const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet) })
   const html = toHtml(md, preset)
 
   return {
-    title,
-    slug: getSlug(title),
+    page,
+    slug: getSlug(page),
     toc: getTocData(html),
     firstParagraphText: getFirstParagraphText(md),
     frontmatter: getFrontmatter(rawMd),
@@ -74,14 +73,28 @@ function all(
   }
 }
 
+function getMarks(filePathList: string[], pageAllowSet: Set<string>): Mark[] {
+  const marks = []
+
+  for (const filePath of filePathList) {
+    const page = getPage(filePath)
+    if (pageAllowSet.has(page)) {
+      marks.push(getMark(filePath, pageAllowSet))
+    }
+  }
+
+  return marks
+}
+
 export const Metamark = {
-  all,
   getFirstParagraphText,
   getFrontmatter,
+  getMark,
+  getMarks,
   getMdNoFrontmatter,
   getRawMd,
   getSlug,
-  getTitle,
+  getPage,
   getTocData,
   preset,
   presetBuilder,

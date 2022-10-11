@@ -2,13 +2,12 @@ import assert from 'assert/strict'
 import { describe, it } from 'node:test'
 import { Metamark } from '../dist/index.js'
 
-describe('Metamark.all', () => {
+describe('Metamark.getMark', () => {
   it('works with defaults', () => {
-    const pageAllowSet = new Set()
-    pageAllowSet.add('Wiki Link')
-    const actual = Metamark.all('./tests/Test File.md', pageAllowSet)
+    const pageAllowSet = new Set(['Wiki Link'])
+    const actual = Metamark.getMark('./tests/Test File.md', pageAllowSet)
 
-    assert.deepEqual(actual.title, 'Test File')
+    assert.deepEqual(actual.page, 'Test File')
     assert.deepEqual(actual.slug, 'test-file')
     assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
     assert.deepEqual(actual.frontmatter, {

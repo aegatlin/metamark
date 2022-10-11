@@ -6,11 +6,11 @@ declare function getFrontmatter(rawMd: string): {
 };
 declare function getFirstParagraphText(md: string): string;
 declare function toHtml(md: string, preset: Preset): string;
-declare function getTitle(filePath: string): string;
+declare function getPage(filePath: string): string;
 declare function getRawMd(filePath: string): string;
 declare function getMdNoFrontmatter(rawMd: string): string;
-declare function all(filePath: string, pageAllowSet: Set<string>): {
-    title: string;
+export interface Mark {
+    page: string;
     slug: string;
     toc: MetamarkTocItem[];
     firstParagraphText: string;
@@ -18,15 +18,18 @@ declare function all(filePath: string, pageAllowSet: Set<string>): {
         [key: string]: any;
     };
     html: string;
-};
+}
+declare function getMark(filePath: string, pageAllowSet: Set<string>): Mark;
+declare function getMarks(filePathList: string[], pageAllowSet: Set<string>): Mark[];
 export declare const Metamark: {
-    all: typeof all;
     getFirstParagraphText: typeof getFirstParagraphText;
     getFrontmatter: typeof getFrontmatter;
+    getMark: typeof getMark;
+    getMarks: typeof getMarks;
     getMdNoFrontmatter: typeof getMdNoFrontmatter;
     getRawMd: typeof getRawMd;
     getSlug: typeof getSlug;
-    getTitle: typeof getTitle;
+    getPage: typeof getPage;
     getTocData: typeof getTocData;
     preset: Preset;
     presetBuilder: ({ toLink }: {

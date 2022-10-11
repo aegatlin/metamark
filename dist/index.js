@@ -26,9 +26,9 @@ function getFirstParagraphText(md) {
 function toHtml(md, preset) {
     return unified().use(preset).processSync(md).toString();
 }
-function getTitle(filePath) {
-    const { name: title } = path.parse(filePath);
-    return title;
+function getPage(filePath) {
+    const { name: page } = path.parse(filePath);
+    return page;
 }
 function getRawMd(filePath) {
     return readFileSync(filePath, 'utf8');
@@ -37,29 +37,40 @@ function getMdNoFrontmatter(rawMd) {
     const { content: md } = matter(rawMd);
     return md;
 }
-function all(filePath, pageAllowSet) {
+function getMark(filePath, pageAllowSet) {
     const rawMd = getRawMd(filePath);
-    const title = getTitle(filePath);
+    const page = getPage(filePath);
     const md = getMdNoFrontmatter(rawMd);
     const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet) });
     const html = toHtml(md, preset);
     return {
-        title,
-        slug: getSlug(title),
+        page,
+        slug: getSlug(page),
         toc: getTocData(html),
         firstParagraphText: getFirstParagraphText(md),
         frontmatter: getFrontmatter(rawMd),
         html,
     };
 }
+function getMarks(filePathList, pageAllowSet) {
+    const marks = [];
+    for (const filePath of filePathList) {
+        const page = getPage(filePath);
+        if (pageAllowSet.has(page)) {
+            marks.push(getMark(filePath, pageAllowSet));
+        }
+    }
+    return marks;
+}
 export const Metamark = {
-    all,
     getFirstParagraphText,
     getFrontmatter,
+    getMark,
+    getMarks,
     getMdNoFrontmatter,
     getRawMd,
     getSlug,
-    getTitle,
+    getPage,
     getTocData,
     preset,
     presetBuilder,

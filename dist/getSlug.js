@@ -1,4 +1,4 @@
 import slugify from '@sindresorhus/slugify';
-export function getSlug(title) {
-    return slugify(title, { decamelize: true });
+export function getSlug(s) {
+    return slugify(s, { decamelize: true });
 }

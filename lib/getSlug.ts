@@ -1,5 +1,5 @@
 import slugify from '@sindresorhus/slugify'
 
-export function getSlug(title: string): string {
-  return slugify(title, { decamelize: true })
+export function getSlug(s: string): string {
+  return slugify(s, { decamelize: true })
 }
