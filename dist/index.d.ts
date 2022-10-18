@@ -5,6 +5,7 @@ declare function getFrontmatter(rawMd: string): {
     [key: string]: any;
 };
 declare function getFirstParagraphText(md: string): string;
+declare function toText(md: string): string;
 declare function toHtml(md: string, preset: Preset): string;
 declare function getPage(filePath: string): string;
 declare function getRawMd(filePath: string): string;
@@ -18,6 +19,7 @@ export interface Mark {
         [key: string]: any;
     };
     html: string;
+    text: string;
 }
 declare function getMark(filePath: string, pageAllowSet: Set<string>): Mark;
 declare function getMarks(filePathList: string[], pageAllowSet: Set<string>): Mark[];
@@ -36,5 +38,6 @@ export declare const Metamark: {
         toLink: any;
     }) => Preset;
     toHtml: typeof toHtml;
+    toText: typeof toText;
 };
 export {};

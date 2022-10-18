@@ -22,5 +22,9 @@ describe('Metamark.getMark', () => {
       actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
     )
+    assert.match(
+      actual.text,
+      /This is a Wiki Link./g
+    )
   })
 })

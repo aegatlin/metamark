@@ -5,6 +5,7 @@ import path from 'path'
 import remarkGfm from 'remark-gfm'
 import { remarkObsidianLink } from 'remark-obsidian-link'
 import remarkParse from 'remark-parse'
+import remarkRetext from 'remark-retext'
 import { Preset, unified } from 'unified'
 import { getSlug } from './getSlug.js'
 import { getTocData, MetamarkTocItem } from './getTocData.js'
@@ -20,13 +21,23 @@ function getFirstParagraphText(md: string): string {
   const mdast = unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkObsidianLink, { toLink: () => '' }) // turn off links
+    .use(remarkObsidianLink)
     .parse(md)
 
   const firstParagraph = mdast.children.find(
     (child) => child.type === 'paragraph'
   )
   return toString(firstParagraph)
+}
+
+function toText(md: string): string {
+  const mdast = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkObsidianLink)
+    .parse(md)
+
+  return toString(mdast)
 }
 
 function toHtml(md: string, preset: Preset): string {
@@ -54,6 +65,7 @@ export interface Mark {
   firstParagraphText: string
   frontmatter: { [key: string]: any }
   html: string
+  text: string
 }
 
 function getMark(filePath: string, pageAllowSet: Set<string>): Mark {
@@ -70,6 +82,7 @@ function getMark(filePath: string, pageAllowSet: Set<string>): Mark {
     firstParagraphText: getFirstParagraphText(md),
     frontmatter: getFrontmatter(rawMd),
     html,
+    text: toText(md),
   }
 }
 
@@ -99,4 +112,5 @@ export const Metamark = {
   preset,
   presetBuilder,
   toHtml,
+  toText,
 }

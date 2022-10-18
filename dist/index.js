@@ -18,10 +18,18 @@ function getFirstParagraphText(md) {
     const mdast = unified()
         .use(remarkParse)
         .use(remarkGfm)
-        .use(remarkObsidianLink, { toLink: () => '' }) // turn off links
+        .use(remarkObsidianLink)
         .parse(md);
     const firstParagraph = mdast.children.find((child) => child.type === 'paragraph');
     return toString(firstParagraph);
+}
+function toText(md) {
+    const mdast = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkObsidianLink)
+        .parse(md);
+    return toString(mdast);
 }
 function toHtml(md, preset) {
     return unified().use(preset).processSync(md).toString();
@@ -50,6 +58,7 @@ function getMark(filePath, pageAllowSet) {
         firstParagraphText: getFirstParagraphText(md),
         frontmatter: getFrontmatter(rawMd),
         html,
+        text: toText(md),
     };
 }
 function getMarks(filePathList, pageAllowSet) {
@@ -75,4 +84,5 @@ export const Metamark = {
     preset,
     presetBuilder,
     toHtml,
+    toText,
 };
