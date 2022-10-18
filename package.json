@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.6.2",
   "main": "dist/index.js",
+  "repository": "aegatlin/metamark",
   "scripts": {
     "ppp": "npm version patch && git push && npm publish",
     "build": "tsc",
