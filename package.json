@@ -36,6 +36,7 @@
     "rehype-highlight": "^5.0.2",
     "rehype-slug": "^5.0.1",
     "rehype-stringify": "^9.0.3",
+    "remark-callouts": "^2.0.0",
     "remark-gfm": "^3.0.1",
     "remark-obsidian-link": "^0.2.1",
     "remark-parse": "^10.0.1",

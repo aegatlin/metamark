@@ -7,10 +7,12 @@ import remarkGfm from 'remark-gfm';
 import { remarkObsidianLink } from 'remark-obsidian-link';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
+import callouts from 'remark-callouts';
 export const presetBuilder = ({ toLink }) => {
     return {
         plugins: [
             remarkParse,
+            callouts,
             remarkGfm,
             [remarkObsidianLink, { toLink }],
             remarkRehype,
