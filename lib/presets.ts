@@ -8,11 +8,13 @@ import { remarkObsidianLink } from 'remark-obsidian-link'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { Preset } from 'unified'
+import callouts from 'remark-callouts'
 
 export const presetBuilder = ({ toLink }): Preset => {
   return {
     plugins: [
       remarkParse,
+      callouts,
       remarkGfm,
       [remarkObsidianLink, { toLink }],
       remarkRehype,
