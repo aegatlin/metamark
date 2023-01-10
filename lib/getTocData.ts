@@ -14,7 +14,7 @@ export function getTocData(html: string): MetamarkTocItem[] {
 
   const flatToc: MetamarkTocItem[] = []
 
-  visit(hast, heading, (node) => {
+  visit(hast, heading, (node: any) => {
     const tagName = node?.tagName
     flatToc.push({
       title: toText(node),
