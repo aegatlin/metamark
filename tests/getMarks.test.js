@@ -53,5 +53,12 @@ describe('Metamark.getMarks', () => {
       actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
     )
+
+    assert.match(
+      actual.html,
+      /<a href="http:\/\/www.google.com" target="_blank" rel="nofollow">external link<\/a>/g
+    )
+
+
   })
 })

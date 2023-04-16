@@ -12,6 +12,8 @@ I am a markdown file!
 
 This is a [[Wiki Link]].
 
+This is an [external link](http://www.google.com).
+
 ## More
 
 And a very good one, too!
