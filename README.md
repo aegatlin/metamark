@@ -57,7 +57,7 @@ type: `(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOpt
 
 where 
 ```
-export type GetPageUri = (page: string, toSlug: typeof getSlug) => {uri: string, slug: string};
+export type GetPageUri = (page: string, toSlug: (s: string) => string) => {uri: string, slug: string};
 export type GetPageUriBuilder = (x: {frontmatter: { [key: string]: any }}) => GetPageUri
 
 export interface  GetMarksOptions {

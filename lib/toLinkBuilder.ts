@@ -6,7 +6,7 @@ import {
 } from './obsidianLinkBuilder.js'
 import { WikiLink, Link } from 'remark-obsidian-link'
 
-export type GetPageUri = (page: string, toSlug: typeof getSlug) => {uri: string, slug: string};
+export type GetPageUri = (page: string, toSlug: (s: string) => string) => {uri: string, slug: string};
 export type GetPageUriBuilder = (x: {frontmatter: { [key: string]: any }}) => GetPageUri
 export type ToLink = (wikiLink: WikiLink) => Link | string
 type ToUri = (x: { page?: string; header?: string }) => string
