@@ -53,9 +53,39 @@ type: `(rawMd: string) => { [key: string]: any }`
 
 ### Metamark.getMarks
 
-type: `(filePathList: string[], pageAllowSet: Set<string>) => Mark[]`
+type: `(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions) => Mark[]`
+
+where 
+```
+export type GetPageUri = (page: string, toSlug: typeof getSlug) => {uri: string, slug: string};
+export type GetPageUriBuilder = (x: {frontmatter: { [key: string]: any }}) => GetPageUri
+
+export interface  GetMarksOptions {
+  getPageUriBuilder?: GetPageUriBuilder
+}
+```
 
 Creates an array of `Mark` objects (defined in `lib/index.ts`). Each `Mark` contains data related to individual files like `slug`, `toc` (table of contents), `html`, etc. An individual `Mark` can be fetched via `Metamark.getMark`.
+
+#### option 'getPageUriBuilder'
+By default, when you create a link to another page in Obsidian, the link will use the following pattern: `/content/{page slug}`. However, you can customize this pattern using the `getPageUriBuilder` function.
+
+To customize the link, you'll need to provide a function to the `getPageUriBuilder` option. This function takes the page's frontmatter as its argument and returns another function that takes two arguments: page (the page slug) and toSlug (a function that converts a string to a slug).
+
+Here's an example of how you can use getPageUriBuilder to customize the link:
+
+```
+{
+  getPageUriBuilder: ({ frontmatter }) => (page, toSlug) => ({
+    uri: '/blog',
+    slug: toSlug(`${page} custom SUFFIX`)
+  })
+}
+```
+
+For example, if the page slug is my-page, the customized link would be `/blog/my-page-custom-suffix`.
+
+Note that toSlug is a function that converts a string to a slug format (e.g., "My Page Title" becomes "my-page-title").
 
 ### Metamark.getTocData
 

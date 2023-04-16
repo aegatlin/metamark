@@ -19,6 +19,7 @@ describe('Metamark.getMarks', () => {
     assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
     assert.deepEqual(actual.frontmatter, {
       public: true,
+      slugBase: '/custom-base',
       tags: ['markdown', 'yaml', 'html'],
     })
     assert.deepEqual(actual.toc, [
@@ -28,6 +29,10 @@ describe('Metamark.getMarks', () => {
     assert.match(
       actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
+    )
+    assert.match(
+        actual.html,
+        /<a href="http:\/\/www.google.com" target="_blank" rel="nofollow">external link<\/a>/g
     )
   })
 
@@ -41,6 +46,7 @@ describe('Metamark.getMarks', () => {
     assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
     assert.deepEqual(actual.frontmatter, {
       public: true,
+      slugBase: '/custom-base',
       tags: ['markdown', 'yaml', 'html'],
     })
     assert.deepEqual(actual.toc, [
@@ -53,12 +59,23 @@ describe('Metamark.getMarks', () => {
       actual.html,
       /<a href="\/content\/wiki-link" title="">Wiki Link<\/a>/g
     )
-
-    assert.match(
-      actual.html,
-      /<a href="http:\/\/www.google.com" target="_blank" rel="nofollow">external link<\/a>/g
-    )
-
-
   })
+})
+
+
+
+it('accept custom get slug builder function', () => {
+  const pageAllowSet = new Set(['Test File', 'Wiki Link'])
+  const actuals = Metamark.getMarks(['./tests/Test File.md'], pageAllowSet, {
+    getPageUriBuilder: ({frontmatter}) => (page, getSlug) => ({
+      uri: frontmatter.slugBase,
+      slug: getSlug(`${page} custom SUFFIX`)
+    })
+  })
+  const actual = actuals[0]
+
+  assert.match(
+      actual.html,
+      /<a href="\/custom-base\/wiki-link-custom-suffix" title="">Wiki Link<\/a>/g
+  )
 })

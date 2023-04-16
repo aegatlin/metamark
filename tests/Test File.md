@@ -1,5 +1,6 @@
 ---
 public: true
+slugBase: "/custom-base"
 tags:
   - markdown
   - yaml
