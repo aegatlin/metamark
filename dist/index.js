@@ -45,28 +45,31 @@ function getMdNoFrontmatter(rawMd) {
     const { content: md } = matter(rawMd);
     return md;
 }
-function getMark(filePath, pageAllowSet) {
+function getMark(filePath, pageAllowSet, options) {
+    var _a, _b;
     const rawMd = getRawMd(filePath);
     const page = getPage(filePath);
     const md = getMdNoFrontmatter(rawMd);
-    const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet) });
+    const frontmatter = getFrontmatter(rawMd);
+    const getPageUri = (_b = (_a = options === null || options === void 0 ? void 0 : options.getPageUriBuilder) === null || _a === void 0 ? void 0 : _a.call(options, { frontmatter })) !== null && _b !== void 0 ? _b : undefined;
+    const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet, getPageUri) });
     const html = toHtml(md, preset);
     return {
         page,
         slug: getSlug(page),
         toc: getTocData(html),
         firstParagraphText: getFirstParagraphText(md),
-        frontmatter: getFrontmatter(rawMd),
+        frontmatter,
         html,
         text: toText(md),
     };
 }
-function getMarks(filePathList, pageAllowSet) {
+function getMarks(filePathList, pageAllowSet, options) {
     const marks = [];
     for (const filePath of filePathList) {
         const page = getPage(filePath);
         if (pageAllowSet.has(page)) {
-            marks.push(getMark(filePath, pageAllowSet));
+            marks.push(getMark(filePath, pageAllowSet, options));
         }
     }
     return marks;

@@ -9,7 +9,7 @@ import { Preset, unified } from 'unified'
 import { getSlug } from './getSlug.js'
 import { getTocData, MetamarkTocItem } from './getTocData.js'
 import { preset, presetBuilder } from './presets.js'
-import { toLinkBuilder } from './toLinkBuilder.js'
+import {GetPageUriBuilder, toLinkBuilder} from './toLinkBuilder.js'
 
 function getFrontmatter(rawMd: string): { [key: string]: any } {
   const { data: frontmatter } = matter(rawMd)
@@ -57,6 +57,10 @@ function getMdNoFrontmatter(rawMd: string): string {
   return md
 }
 
+export interface  GetMarksOptions {
+  getPageUriBuilder?: GetPageUriBuilder
+}
+
 export interface Mark {
   page: string
   slug: string
@@ -67,11 +71,13 @@ export interface Mark {
   text: string
 }
 
-function getMark(filePath: string, pageAllowSet: Set<string>): Mark {
+function getMark(filePath: string, pageAllowSet: Set<string>, options?: GetMarksOptions): Mark {
   const rawMd = getRawMd(filePath)
   const page = getPage(filePath)
   const md = getMdNoFrontmatter(rawMd)
-  const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet) })
+  const frontmatter = getFrontmatter(rawMd);
+  const getPageUri = options?.getPageUriBuilder?.({ frontmatter }) ?? undefined;
+  const preset = presetBuilder({ toLink: toLinkBuilder(pageAllowSet, getPageUri) })
   const html = toHtml(md, preset)
 
   return {
@@ -79,19 +85,19 @@ function getMark(filePath: string, pageAllowSet: Set<string>): Mark {
     slug: getSlug(page),
     toc: getTocData(html),
     firstParagraphText: getFirstParagraphText(md),
-    frontmatter: getFrontmatter(rawMd),
+    frontmatter,
     html,
     text: toText(md),
   }
 }
 
-function getMarks(filePathList: string[], pageAllowSet: Set<string>): Mark[] {
+function getMarks(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions): Mark[] {
   const marks = []
 
   for (const filePath of filePathList) {
     const page = getPage(filePath)
     if (pageAllowSet.has(page)) {
-      marks.push(getMark(filePath, pageAllowSet))
+      marks.push(getMark(filePath, pageAllowSet, options))
     }
   }
 

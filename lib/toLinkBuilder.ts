@@ -6,18 +6,22 @@ import {
 } from './obsidianLinkBuilder.js'
 import { WikiLink, Link } from 'remark-obsidian-link'
 
+export type GetPageUri = (page: string, toSlug: (s: string) => string) => {uri: string, slug: string};
+export type GetPageUriBuilder = (x: {frontmatter: { [key: string]: any }}) => GetPageUri
 export type ToLink = (wikiLink: WikiLink) => Link | string
 type ToUri = (x: { page?: string; header?: string }) => string
 
-export function toLinkBuilder(pageAllowSet: Set<string>): ToLink {
+export function toLinkBuilder(pageAllowSet: Set<string>, getPageUri?: GetPageUri): ToLink {
   const toUri: ToUri = function ({ page, header }) {
     let headerPart = header ? `#${getSlug(header)}` : ''
-    let pagePart = page ? `/content/${getSlug(page)}` : ''
-
-    if (page && pageAllowSet.has(page)) {
+    let pagePart: string = null;
+    if (page) {
+      const {uri: pageURI, slug: pageSlug} = getPageUri?.(page, getSlug) ?? { uri: '/content', slug: getSlug(page)};
+      pagePart = page ? `${pageURI}/${pageSlug}` : '';
+    }
+    if (pagePart && pageAllowSet.has(page)) {
       return header ? `${pagePart}${headerPart}` : pagePart
     }
-
     return header ? headerPart : ''
   }
 

@@ -9,6 +9,7 @@ import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { Preset } from 'unified'
 import callouts from 'remark-callouts'
+import rehypeExternalLinks from "rehype-external-links";
 
 export const presetBuilder = ({ toLink }): Preset => {
   return {
@@ -18,6 +19,7 @@ export const presetBuilder = ({ toLink }): Preset => {
       remarkGfm,
       [remarkObsidianLink, { toLink }],
       remarkRehype,
+      [rehypeExternalLinks, {rel: ['nofollow'], target: '_blank'}],
       rehypeSlug,
       [rehypeAutolinkHeadings, { behavior: 'wrap' }],
       [rehypeHighlight, { languages: { elixir } }],

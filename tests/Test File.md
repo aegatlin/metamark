@@ -1,5 +1,6 @@
 ---
 public: true
+slugBase: "/custom-base"
 tags:
   - markdown
   - yaml
@@ -11,6 +12,8 @@ tags:
 I am a markdown file!
 
 This is a [[Wiki Link]].
+
+This is an [external link](http://www.google.com).
 
 ## More
 

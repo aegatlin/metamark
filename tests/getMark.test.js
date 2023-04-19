@@ -13,6 +13,7 @@ describe('Metamark.getMark', () => {
     assert.deepEqual(actual.firstParagraphText, 'I am a markdown file!')
     assert.deepEqual(actual.frontmatter, {
       public: true,
+      slugBase: '/custom-base',
       tags: ['markdown', 'yaml', 'html'],
     })
     assert.deepEqual(actual.toc, [
