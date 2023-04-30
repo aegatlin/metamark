@@ -2,14 +2,20 @@
   "name": "metamark",
   "type": "module",
   "version": "0.8.0",
-  "main": "dist/index.js",
   "repository": "aegatlin/metamark",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
   "scripts": {
     "ppp": "npm version patch && git push && npm publish",
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "build": "tsup lib/index.ts --dts --format esm,cjs",
+    "dev": "npm run build -- --watch",
     "format": "prettier --write lib",
-    "test": "node --test"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@sindresorhus/slugify": "^2.1.0",
@@ -36,7 +42,10 @@
     "@types/node": "^18.7.23",
     "mdast": "^3.0.0",
     "prettier": "^2.7.1",
+    "tsup": "^6.7.0",
     "typescript": "^4.8.4",
-    "unified": "^10.1.2"
+    "unified": "^10.1.2",
+    "vite": "^4.3.3",
+    "vitest": "^0.30.1"
   }
 }

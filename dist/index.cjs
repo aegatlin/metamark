@@ -7,6 +7,10 @@ var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -23,11 +27,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // node_modules/is-buffer/index.js
 var require_is_buffer = __commonJS({
-  "node_modules/is-buffer/index.js"(exports, module) {
-    module.exports = function isBuffer2(obj) {
+  "node_modules/is-buffer/index.js"(exports, module2) {
+    module2.exports = function isBuffer2(obj) {
       return obj != null && obj.constructor != null && typeof obj.constructor.isBuffer === "function" && obj.constructor.isBuffer(obj);
     };
   }
@@ -35,7 +40,7 @@ var require_is_buffer = __commonJS({
 
 // node_modules/extend/index.js
 var require_extend = __commonJS({
-  "node_modules/extend/index.js"(exports, module) {
+  "node_modules/extend/index.js"(exports, module2) {
     "use strict";
     var hasOwn = Object.prototype.hasOwnProperty;
     var toStr = Object.prototype.toString;
@@ -83,7 +88,7 @@ var require_extend = __commonJS({
       }
       return obj[name];
     };
-    module.exports = function extend2() {
+    module2.exports = function extend2() {
       var options, name, src, copy, copyIsArray, clone;
       var target = arguments[0];
       var i = 1;
@@ -124,14 +129,21 @@ var require_extend = __commonJS({
   }
 });
 
+// lib/index.ts
+var lib_exports = {};
+__export(lib_exports, {
+  Metamark: () => Metamark
+});
+module.exports = __toCommonJS(lib_exports);
+
 // lib/metamark.ts
-import { readFileSync } from "fs";
-import matter from "gray-matter";
-import { toString } from "mdast-util-to-string";
-import path from "path";
-import remarkGfm2 from "remark-gfm";
-import { remarkObsidianLink as remarkObsidianLink2 } from "remark-obsidian-link";
-import remarkParse2 from "remark-parse";
+var import_fs = require("fs");
+var import_gray_matter = __toESM(require("gray-matter"), 1);
+var import_mdast_util_to_string = require("mdast-util-to-string");
+var import_path2 = __toESM(require("path"), 1);
+var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
+var import_remark_obsidian_link2 = require("remark-obsidian-link");
+var import_remark_parse2 = __toESM(require("remark-parse"), 1);
 
 // node_modules/bail/index.js
 function bail(error) {
@@ -339,13 +351,13 @@ VFileMessage.prototype.ruleId = null;
 VFileMessage.prototype.position = null;
 
 // node_modules/vfile/lib/minpath.js
-import { default as default2 } from "path";
+var import_path = __toESM(require("path"), 1);
 
 // node_modules/vfile/lib/minproc.js
-import { default as default3 } from "process";
+var import_process = __toESM(require("process"), 1);
 
 // node_modules/vfile/lib/minurl.js
-import { fileURLToPath } from "url";
+var import_url = require("url");
 
 // node_modules/vfile/lib/minurl.shared.js
 function isUrl(fileURLOrPath) {
@@ -388,7 +400,7 @@ var VFile = class {
     this.data = {};
     this.messages = [];
     this.history = [];
-    this.cwd = default3.cwd();
+    this.cwd = import_process.default.cwd();
     this.value;
     this.stored;
     this.result;
@@ -422,7 +434,7 @@ var VFile = class {
    */
   set path(path2) {
     if (isUrl(path2)) {
-      path2 = fileURLToPath(path2);
+      path2 = (0, import_url.fileURLToPath)(path2);
     }
     assertNonEmpty(path2, "path");
     if (this.path !== path2) {
@@ -433,7 +445,7 @@ var VFile = class {
    * Get the parent path (example: `'~'`).
    */
   get dirname() {
-    return typeof this.path === "string" ? default2.dirname(this.path) : void 0;
+    return typeof this.path === "string" ? import_path.default.dirname(this.path) : void 0;
   }
   /**
    * Set the parent path (example: `'~'`).
@@ -441,13 +453,13 @@ var VFile = class {
    */
   set dirname(dirname) {
     assertPath(this.basename, "dirname");
-    this.path = default2.join(dirname || "", this.basename);
+    this.path = import_path.default.join(dirname || "", this.basename);
   }
   /**
    * Get the basename (including extname) (example: `'index.min.js'`).
    */
   get basename() {
-    return typeof this.path === "string" ? default2.basename(this.path) : void 0;
+    return typeof this.path === "string" ? import_path.default.basename(this.path) : void 0;
   }
   /**
    * Set basename (including extname) (`'index.min.js'`).
@@ -458,13 +470,13 @@ var VFile = class {
   set basename(basename) {
     assertNonEmpty(basename, "basename");
     assertPart(basename, "basename");
-    this.path = default2.join(this.dirname || "", basename);
+    this.path = import_path.default.join(this.dirname || "", basename);
   }
   /**
    * Get the extname (including dot) (example: `'.js'`).
    */
   get extname() {
-    return typeof this.path === "string" ? default2.extname(this.path) : void 0;
+    return typeof this.path === "string" ? import_path.default.extname(this.path) : void 0;
   }
   /**
    * Set the extname (including dot) (example: `'.js'`).
@@ -483,13 +495,13 @@ var VFile = class {
         throw new Error("`extname` cannot contain multiple dots");
       }
     }
-    this.path = default2.join(this.dirname, this.stem + (extname || ""));
+    this.path = import_path.default.join(this.dirname, this.stem + (extname || ""));
   }
   /**
    * Get the stem (basename w/o extname) (example: `'index.min'`).
    */
   get stem() {
-    return typeof this.path === "string" ? default2.basename(this.path, this.extname) : void 0;
+    return typeof this.path === "string" ? import_path.default.basename(this.path, this.extname) : void 0;
   }
   /**
    * Set the stem (basename w/o extname) (example: `'index.min'`).
@@ -500,7 +512,7 @@ var VFile = class {
   set stem(stem) {
     assertNonEmpty(stem, "stem");
     assertPart(stem, "stem");
-    this.path = default2.join(this.dirname || "", stem + (this.extname || ""));
+    this.path = import_path.default.join(this.dirname || "", stem + (this.extname || ""));
   }
   /**
    * Serialize the file.
@@ -578,9 +590,9 @@ var VFile = class {
   }
 };
 function assertPart(part, name) {
-  if (part && part.includes(default2.sep)) {
+  if (part && part.includes(import_path.default.sep)) {
     throw new Error(
-      "`" + name + "` cannot be a path: did not expect `" + default2.sep + "`"
+      "`" + name + "` cannot be a path: did not expect `" + import_path.default.sep + "`"
     );
   }
 }
@@ -901,26 +913,26 @@ function looksLikeAVFileValue(value) {
 }
 
 // lib/getSlug.ts
-import slugify from "@sindresorhus/slugify";
+var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
 function getSlug(s) {
-  let str = slugify(s, { decamelize: false });
+  let str = (0, import_slugify.default)(s, { decamelize: false });
   str = str.replace(/([a-zA-Z\d]+)-([ts])(-|$)/g, "$1$2$3");
   return str;
 }
 
 // lib/getTocData.ts
-import { fromHtml } from "hast-util-from-html";
-import { heading } from "hast-util-heading";
-import { toText } from "hast-util-to-text";
-import { visit } from "unist-util-visit";
+var import_hast_util_from_html = require("hast-util-from-html");
+var import_hast_util_heading = require("hast-util-heading");
+var import_hast_util_to_text = require("hast-util-to-text");
+var import_unist_util_visit = require("unist-util-visit");
 function getTocData(html) {
-  const hast = fromHtml(html);
+  const hast = (0, import_hast_util_from_html.fromHtml)(html);
   const flatToc = [];
-  visit(hast, heading, (node) => {
+  (0, import_unist_util_visit.visit)(hast, import_hast_util_heading.heading, (node) => {
     var _a;
     const tagName = node == null ? void 0 : node.tagName;
     flatToc.push({
-      title: toText(node),
+      title: (0, import_hast_util_to_text.toText)(node),
       depth: parseInt(tagName == null ? void 0 : tagName.at(1)) || -1,
       id: (_a = node == null ? void 0 : node.properties) == null ? void 0 : _a.id
     });
@@ -1201,42 +1213,42 @@ function elixir(hljs) {
 }
 
 // lib/presets.ts
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeHighlight from "rehype-highlight";
-import rehypeSlug from "rehype-slug";
-import rehypeStringify from "rehype-stringify";
-import remarkGfm from "remark-gfm";
-import { remarkObsidianLink } from "remark-obsidian-link";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import callouts from "remark-callouts";
-import rehypeExternalLinks from "rehype-external-links";
+var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
+var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
+var import_rehype_slug = __toESM(require("rehype-slug"), 1);
+var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
+var import_remark_gfm = __toESM(require("remark-gfm"), 1);
+var import_remark_obsidian_link = require("remark-obsidian-link");
+var import_remark_parse = __toESM(require("remark-parse"), 1);
+var import_remark_rehype = __toESM(require("remark-rehype"), 1);
+var import_remark_callouts = __toESM(require("remark-callouts"), 1);
+var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
 var presetBuilder = ({ toLink }) => {
   return {
     plugins: [
-      remarkParse,
-      callouts,
-      remarkGfm,
-      [remarkObsidianLink, { toLink }],
-      remarkRehype,
-      [rehypeExternalLinks, { rel: ["nofollow"], target: "_blank" }],
-      rehypeSlug,
-      [rehypeAutolinkHeadings, { behavior: "wrap" }],
-      [rehypeHighlight, { languages: { elixir } }],
-      rehypeStringify
+      import_remark_parse.default,
+      import_remark_callouts.default,
+      import_remark_gfm.default,
+      [import_remark_obsidian_link.remarkObsidianLink, { toLink }],
+      import_remark_rehype.default,
+      [import_rehype_external_links.default, { rel: ["nofollow"], target: "_blank" }],
+      import_rehype_slug.default,
+      [import_rehype_autolink_headings.default, { behavior: "wrap" }],
+      [import_rehype_highlight.default, { languages: { elixir } }],
+      import_rehype_stringify.default
     ]
   };
 };
 var preset = {
   plugins: [
-    remarkParse,
-    remarkGfm,
-    remarkObsidianLink,
-    remarkRehype,
-    rehypeSlug,
-    [rehypeAutolinkHeadings, { behavior: "wrap" }],
-    [rehypeHighlight, { languages: { elixir } }],
-    rehypeStringify
+    import_remark_parse.default,
+    import_remark_gfm.default,
+    import_remark_obsidian_link.remarkObsidianLink,
+    import_remark_rehype.default,
+    import_rehype_slug.default,
+    [import_rehype_autolink_headings.default, { behavior: "wrap" }],
+    [import_rehype_highlight.default, { languages: { elixir } }],
+    import_rehype_stringify.default
   ]
 };
 
@@ -1345,32 +1357,32 @@ function obLinkToLink(oLink, toUri) {
 
 // lib/metamark.ts
 function getFrontmatter(rawMd) {
-  const { data: frontmatter } = matter(rawMd);
+  const { data: frontmatter } = (0, import_gray_matter.default)(rawMd);
   return frontmatter;
 }
 function getFirstParagraphText(md) {
-  const mdast = unified().use(remarkParse2).use(remarkGfm2).use(remarkObsidianLink2).parse(md);
+  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
   const firstParagraph = mdast.children.find(
     (child) => child.type === "paragraph"
   );
-  return toString(firstParagraph);
+  return (0, import_mdast_util_to_string.toString)(firstParagraph);
 }
 function toText2(md) {
-  const mdast = unified().use(remarkParse2).use(remarkGfm2).use(remarkObsidianLink2).parse(md);
-  return toString(mdast);
+  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
+  return (0, import_mdast_util_to_string.toString)(mdast);
 }
 function toHtml(md, preset2) {
   return unified().use(preset2).processSync(md).toString();
 }
 function getPage(filePath) {
-  const { name: page } = path.parse(filePath);
+  const { name: page } = import_path2.default.parse(filePath);
   return page;
 }
 function getRawMd(filePath) {
-  return readFileSync(filePath, "utf8");
+  return (0, import_fs.readFileSync)(filePath, "utf8");
 }
 function getMdNoFrontmatter(rawMd) {
-  const { content: md } = matter(rawMd);
+  const { content: md } = (0, import_gray_matter.default)(rawMd);
   return md;
 }
 function getMark(filePath, pageAllowSet, options) {
@@ -1419,9 +1431,10 @@ var Metamark = {
   toHtml,
   toText: toText2
 };
-export {
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
   Metamark
-};
+});
 /*! Bundled license information:
 
 is-buffer/index.js:
