@@ -43,7 +43,7 @@ writeFileSync('./contents.json', jsonContents)
 
 ## API
 
-See `lib/index.ts` for all APIs attacked to the `Metamark` top-level object. Some of the most important are as follows.
+See `lib/index.ts` for all APIs attached to the `Metamark` top-level object. Some of the most important are as follows.
 
 ### Metamark.getFrontmatter
 

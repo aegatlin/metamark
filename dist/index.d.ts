@@ -1,7 +1,24 @@
-import { Preset } from "unified";
-import { getSlug } from "./getSlug.js";
-import { getTocData, MetamarkTocItem } from "./getTocData.js";
-import { GetPageUriBuilder } from "./toLinkBuilder.js";
+import { Preset } from 'unified';
+
+declare function getSlug(s: string): string;
+
+interface MetamarkTocItem {
+    title: string;
+    depth: number;
+    id: string;
+}
+declare function getTocData(html: string): MetamarkTocItem[];
+
+declare type GetPageUri = (page: string, toSlug: (s: string) => string) => {
+    uri: string;
+    slug: string;
+};
+declare type GetPageUriBuilder = (x: {
+    frontmatter: {
+        [key: string]: any;
+    };
+}) => GetPageUri;
+
 declare function getFrontmatter(rawMd: string): {
     [key: string]: any;
 };
@@ -11,10 +28,10 @@ declare function toHtml(md: string, preset: Preset): string;
 declare function getPage(filePath: string): string;
 declare function getRawMd(filePath: string): string;
 declare function getMdNoFrontmatter(rawMd: string): string;
-export interface GetMarksOptions {
+interface GetMarksOptions {
     getPageUriBuilder?: GetPageUriBuilder;
 }
-export interface Mark {
+interface Mark {
     page: string;
     slug: string;
     toc: MetamarkTocItem[];
@@ -27,7 +44,7 @@ export interface Mark {
 }
 declare function getMark(filePath: string, pageAllowSet: Set<string>, options?: GetMarksOptions): Mark;
 declare function getMarks(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions): Mark[];
-export declare const Metamark: {
+declare const Metamark: {
     getFirstParagraphText: typeof getFirstParagraphText;
     getFrontmatter: typeof getFrontmatter;
     getMark: typeof getMark;
@@ -44,4 +61,5 @@ export declare const Metamark: {
     toHtml: typeof toHtml;
     toText: typeof toText;
 };
-export {};
+
+export { GetMarksOptions, Mark, Metamark, MetamarkTocItem };
