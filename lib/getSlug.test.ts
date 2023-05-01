@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getSlug } from "../lib/getSlug";
+import { getSlug } from "./getSlug.js";
 
 test("works", () => {
   expect(getSlug("Wiki Link")).toBe("wiki-link");

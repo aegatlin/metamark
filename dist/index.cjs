@@ -915,9 +915,7 @@ function looksLikeAVFileValue(value) {
 // lib/getSlug.ts
 var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
 function getSlug(s) {
-  let str = (0, import_slugify.default)(s, { decamelize: false });
-  str = str.replace(/([a-zA-Z\d]+)-([ts])(-|$)/g, "$1$2$3");
-  return str;
+  return (0, import_slugify.default)(s, { decamelize: false });
 }
 
 // lib/getTocData.ts

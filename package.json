@@ -18,7 +18,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@sindresorhus/slugify": "^2.1.0",
+    "@sindresorhus/slugify": "^2.2.0",
     "@types/mdast": "^3.0.10",
     "gray-matter": "^4.0.3",
     "hast-util-from-html": "^1.0.0",
