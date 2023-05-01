@@ -903,9 +903,7 @@ function looksLikeAVFileValue(value) {
 // lib/getSlug.ts
 import slugify from "@sindresorhus/slugify";
 function getSlug(s) {
-  let str = slugify(s, { decamelize: false });
-  str = str.replace(/([a-zA-Z\d]+)-([ts])(-|$)/g, "$1$2$3");
-  return str;
+  return slugify(s, { decamelize: false });
 }
 
 // lib/getTocData.ts
