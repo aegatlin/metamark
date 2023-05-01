@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { Metamark } from "../lib/metamark";
+import { Metamark } from "./metamark.js";
 import { unified } from "unified";
 
 test("preset", () => {

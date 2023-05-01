@@ -1,5 +1,5 @@
 import { expect, test, describe, it } from "vitest";
-import { toLinkBuilder } from "../lib/toLinkBuilder";
+import { toLinkBuilder } from "./toLinkBuilder.js";
 
 test("toLinkBuilder with empty pageAllowSet", () => {
   const toLink = toLinkBuilder(new Set());
