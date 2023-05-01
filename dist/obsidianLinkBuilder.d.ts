@@ -1,4 +1,4 @@
-import { WikiLink } from 'remark-obsidian-link';
+import { WikiLink } from "remark-obsidian-link";
 export declare enum ObsidianLinkType {
     Page = "page",
     PageHeader = "page-header",

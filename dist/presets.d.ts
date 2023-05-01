@@ -1,4 +1,4 @@
-import { Preset } from 'unified';
+import { Preset } from "unified";
 export declare const presetBuilder: ({ toLink }: {
     toLink: any;
 }) => Preset;

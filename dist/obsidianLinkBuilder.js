@@ -16,7 +16,7 @@ const Regex = {
 function parseWikiLinkString(wikiLinkString) {
     const content = wikiLinkString.slice(2, -2);
     if (Regex.Alias.test(content)) {
-        let [value, alias] = content.split('|');
+        let [value, alias] = content.split("|");
         return { value: value.trim(), alias: alias.trim() };
     }
     else {
@@ -24,33 +24,33 @@ function parseWikiLinkString(wikiLinkString) {
     }
 }
 export function obsidianLinkBuilder(wikiLink) {
-    const { value, alias } = typeof wikiLink === 'string' ? parseWikiLinkString(wikiLink) : wikiLink;
+    const { value, alias } = typeof wikiLink === "string" ? parseWikiLinkString(wikiLink) : wikiLink;
     let out = {};
     if (alias)
-        out['alias'] = alias;
+        out["alias"] = alias;
     if (Regex.InternalHeader.test(value)) {
-        out['type'] = ObsidianLinkType.Header;
-        out['header'] = value.slice(1);
+        out["type"] = ObsidianLinkType.Header;
+        out["header"] = value.slice(1);
     }
     else if (Regex.InternalBlock.test(value)) {
-        out['type'] = ObsidianLinkType.Block;
-        out['block'] = value.slice(2);
+        out["type"] = ObsidianLinkType.Block;
+        out["block"] = value.slice(2);
     }
     else if (Regex.ExternalHeader.test(value)) {
-        const [page, header] = value.split('#');
-        out['type'] = ObsidianLinkType.PageHeader;
-        out['page'] = page;
-        out['header'] = header;
+        const [page, header] = value.split("#");
+        out["type"] = ObsidianLinkType.PageHeader;
+        out["page"] = page;
+        out["header"] = header;
     }
     else if (Regex.ExternalBlock.test(value)) {
-        const [page, block] = value.split('#^');
-        out['type'] = ObsidianLinkType.PageBlock;
-        out['page'] = page;
-        out['block'] = block;
+        const [page, block] = value.split("#^");
+        out["type"] = ObsidianLinkType.PageBlock;
+        out["page"] = page;
+        out["block"] = block;
     }
     else {
-        out['type'] = ObsidianLinkType.Page;
-        out['page'] = value;
+        out["type"] = ObsidianLinkType.Page;
+        out["page"] = value;
     }
     return out;
 }

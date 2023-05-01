@@ -1,7 +1,7 @@
-import { fromHtml } from 'hast-util-from-html';
-import { heading } from 'hast-util-heading';
-import { toText } from 'hast-util-to-text';
-import { visit } from 'unist-util-visit';
+import { fromHtml } from "hast-util-from-html";
+import { heading } from "hast-util-heading";
+import { toText } from "hast-util-to-text";
+import { visit } from "unist-util-visit";
 export function getTocData(html) {
     const hast = fromHtml(html);
     const flatToc = [];

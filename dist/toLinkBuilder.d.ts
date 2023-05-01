@@ -1,6 +1,5 @@
-import { getSlug } from './getSlug.js';
-import { WikiLink, Link } from 'remark-obsidian-link';
-export declare type GetPageUri = (page: string, toSlug: typeof getSlug) => {
+import { WikiLink, Link } from "remark-obsidian-link";
+export declare type GetPageUri = (page: string, toSlug: (s: string) => string) => {
     uri: string;
     slug: string;
 };

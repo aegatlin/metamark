@@ -1,18 +1,21 @@
-import { getSlug } from './getSlug.js';
-import { obsidianLinkBuilder as wikiLinkToObLink, ObsidianLinkType, } from './obsidianLinkBuilder.js';
+import { getSlug } from "./getSlug.js";
+import { obsidianLinkBuilder as wikiLinkToObLink, ObsidianLinkType, } from "./obsidianLinkBuilder.js";
 export function toLinkBuilder(pageAllowSet, getPageUri) {
     const toUri = function ({ page, header }) {
         var _a;
-        let headerPart = header ? `#${getSlug(header)}` : '';
+        let headerPart = header ? `#${getSlug(header)}` : "";
         let pagePart = null;
         if (page) {
-            const { uri: pageURI, slug: pageSlug } = (_a = getPageUri === null || getPageUri === void 0 ? void 0 : getPageUri(page, getSlug)) !== null && _a !== void 0 ? _a : { uri: '/content', slug: getSlug(page) };
-            pagePart = page ? `${pageURI}/${pageSlug}` : '';
+            const { uri: pageURI, slug: pageSlug } = (_a = getPageUri === null || getPageUri === void 0 ? void 0 : getPageUri(page, getSlug)) !== null && _a !== void 0 ? _a : {
+                uri: "/content",
+                slug: getSlug(page),
+            };
+            pagePart = page ? `${pageURI}/${pageSlug}` : "";
         }
         if (pagePart && pageAllowSet.has(page)) {
             return header ? `${pagePart}${headerPart}` : pagePart;
         }
-        return header ? headerPart : '';
+        return header ? headerPart : "";
     };
     const toLink = function (wikiLink) {
         const obLink = wikiLinkToObLink(wikiLink);
@@ -49,7 +52,7 @@ function obLinkToLink(oLink, toUri) {
         }
         case ObsidianLinkType.Block: {
             const { alias } = oLink;
-            return alias || '';
+            return alias || "";
         }
     }
 }

@@ -1,7 +1,7 @@
-import { Preset } from 'unified';
-import { getSlug } from './getSlug.js';
-import { getTocData, MetamarkTocItem } from './getTocData.js';
-import { GetPageUriBuilder } from './toLinkBuilder.js';
+import { Preset } from "unified";
+import { getSlug } from "./getSlug.js";
+import { getTocData, MetamarkTocItem } from "./getTocData.js";
+import { GetPageUriBuilder } from "./toLinkBuilder.js";
 declare function getFrontmatter(rawMd: string): {
     [key: string]: any;
 };
