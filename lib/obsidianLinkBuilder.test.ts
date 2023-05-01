@@ -1,4 +1,4 @@
-import { obsidianLinkBuilder } from "../lib/obsidianLinkBuilder";
+import { obsidianLinkBuilder } from "./obsidianLinkBuilder.js";
 import { test, expect } from "vitest";
 
 test("works", () => {
