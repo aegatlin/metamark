@@ -1,3 +1,4 @@
+"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -132,18 +133,83 @@ var require_extend = __commonJS({
 // lib/index.ts
 var lib_exports = {};
 __export(lib_exports, {
-  Metamark: () => Metamark
+  metamark: () => metamark
 });
 module.exports = __toCommonJS(lib_exports);
 
-// lib/metamark.ts
-var import_fs = require("fs");
+// lib/file/index.ts
 var import_gray_matter = __toESM(require("gray-matter"), 1);
+
+// lib/nod.ts
+var import_node_fs = __toESM(require("fs"), 1);
+var import_node_path = __toESM(require("path"), 1);
+var import_node_process = __toESM(require("process"), 1);
+var nod = {
+  fs: import_node_fs.default,
+  path: import_node_path.default,
+  process: import_node_process.default
+};
+
+// lib/file/index.ts
+var file = {
+  getRaw: {
+    fromFilePath(filePath, n = nod) {
+      return n.fs.readFileSync(filePath, "utf8");
+    }
+  },
+  getMd: {
+    fromRaw(raw) {
+      const { content: md } = (0, import_gray_matter.default)(raw);
+      return md;
+    },
+    fromFilePath(filePath) {
+      const content = file.getRaw.fromFilePath(filePath);
+      return file.getMd.fromRaw(content);
+    }
+  },
+  getFm: {
+    fromRaw(raw) {
+      const { data: fm } = (0, import_gray_matter.default)(raw);
+      return fm;
+    },
+    fromFilePath(filePath) {
+      const content = file.getRaw.fromFilePath(filePath);
+      return file.getFm.fromRaw(content);
+    }
+  },
+  getFileName(filePath, n = nod) {
+    const { name } = n.path.parse(filePath);
+    return name;
+  }
+};
+
+// lib/dir/index.ts
+var dir = {
+  process(dirPath, shouldAdd = defaultShouldAdd, node = nod) {
+    const dirEntries = node.fs.readdirSync(dirPath, { withFileTypes: true });
+    const pageAllowSet = /* @__PURE__ */ new Set();
+    const filePaths = [];
+    dirEntries.forEach((dirEntry) => {
+      if (dirEntry.isFile()) {
+        const filePath = node.path.join(dirPath, dirEntry.name);
+        const page = file.getFileName(filePath);
+        const frontmatter = file.getFm.fromFilePath(filePath);
+        if (shouldAdd({ frontmatter })) {
+          pageAllowSet.add(page);
+          filePaths.push(filePath);
+        }
+      }
+    });
+    return { filePaths, pageAllowSet };
+  }
+};
+var defaultShouldAdd = ({ frontmatter }) => !!(frontmatter == null ? void 0 : frontmatter.public);
+
+// lib/unified/index.ts
 var import_mdast_util_to_string = require("mdast-util-to-string");
-var import_path2 = __toESM(require("path"), 1);
-var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
-var import_remark_obsidian_link2 = require("remark-obsidian-link");
-var import_remark_parse2 = __toESM(require("remark-parse"), 1);
+var import_remark_gfm = __toESM(require("remark-gfm"), 1);
+var import_remark_obsidian_link = require("remark-obsidian-link");
+var import_remark_parse = __toESM(require("remark-parse"), 1);
 
 // node_modules/bail/index.js
 function bail(error) {
@@ -626,7 +692,7 @@ function base() {
   processor.stringify = stringify;
   processor.run = run;
   processor.runSync = runSync;
-  processor.process = process;
+  processor.process = process2;
   processor.processSync = processSync;
   return processor;
   function processor() {
@@ -747,24 +813,24 @@ function base() {
   }
   function parse(doc) {
     processor.freeze();
-    const file = vfile(doc);
+    const file2 = vfile(doc);
     const Parser = processor.Parser;
     assertParser("parse", Parser);
     if (newable(Parser, "parse")) {
-      return new Parser(String(file), file).parse();
+      return new Parser(String(file2), file2).parse();
     }
-    return Parser(String(file), file);
+    return Parser(String(file2), file2);
   }
   function stringify(node, doc) {
     processor.freeze();
-    const file = vfile(doc);
+    const file2 = vfile(doc);
     const Compiler = processor.Compiler;
     assertCompiler("stringify", Compiler);
     assertNode(node);
     if (newable(Compiler, "compile")) {
-      return new Compiler(node, file).compile();
+      return new Compiler(node, file2).compile();
     }
-    return Compiler(node, file);
+    return Compiler(node, file2);
   }
   function run(node, doc, callback) {
     assertNode(node);
@@ -779,22 +845,22 @@ function base() {
     executor(null, callback);
     function executor(resolve, reject) {
       transformers.run(node, vfile(doc), done);
-      function done(error, tree, file) {
+      function done(error, tree, file2) {
         tree = tree || node;
         if (error) {
           reject(error);
         } else if (resolve) {
           resolve(tree);
         } else {
-          callback(null, tree, file);
+          callback(null, tree, file2);
         }
       }
     }
   }
-  function runSync(node, file) {
+  function runSync(node, file2) {
     let result;
     let complete;
-    processor.run(node, file, done);
+    processor.run(node, file2, done);
     assertDone("runSync", "run", complete);
     return result;
     function done(error, tree) {
@@ -803,7 +869,7 @@ function base() {
       complete = true;
     }
   }
-  function process(doc, callback) {
+  function process2(doc, callback) {
     processor.freeze();
     assertParser("process", processor.Parser);
     assertCompiler("process", processor.Compiler);
@@ -812,28 +878,28 @@ function base() {
     }
     executor(null, callback);
     function executor(resolve, reject) {
-      const file = vfile(doc);
-      processor.run(processor.parse(file), file, (error, tree, file2) => {
-        if (error || !tree || !file2) {
+      const file2 = vfile(doc);
+      processor.run(processor.parse(file2), file2, (error, tree, file3) => {
+        if (error || !tree || !file3) {
           done(error);
         } else {
-          const result = processor.stringify(tree, file2);
+          const result = processor.stringify(tree, file3);
           if (result === void 0 || result === null) {
           } else if (looksLikeAVFileValue(result)) {
-            file2.value = result;
+            file3.value = result;
           } else {
-            file2.result = result;
+            file3.result = result;
           }
-          done(error, file2);
+          done(error, file3);
         }
       });
-      function done(error, file2) {
-        if (error || !file2) {
+      function done(error, file3) {
+        if (error || !file3) {
           reject(error);
         } else if (resolve) {
-          resolve(file2);
+          resolve(file3);
         } else {
-          callback(null, file2);
+          callback(null, file3);
         }
       }
     }
@@ -843,10 +909,10 @@ function base() {
     processor.freeze();
     assertParser("processSync", processor.Parser);
     assertCompiler("processSync", processor.Compiler);
-    const file = vfile(doc);
-    processor.process(file, done);
+    const file2 = vfile(doc);
+    processor.process(file2, done);
     assertDone("processSync", "process", complete);
-    return file;
+    return file2;
     function done(error) {
       complete = true;
       bail(error);
@@ -912,13 +978,35 @@ function looksLikeAVFileValue(value) {
   return typeof value === "string" || (0, import_is_buffer2.default)(value);
 }
 
-// lib/getSlug.ts
+// lib/unified/index.ts
+var unified2 = {
+  getFirstParagraphText(md) {
+    const mdast = getMdastRoot(md);
+    const firstParagraph = mdast.children.find(
+      (child) => child.type === "paragraph"
+    );
+    return (0, import_mdast_util_to_string.toString)(firstParagraph);
+  },
+  getHtml(md, preset) {
+    return unified().use(preset).processSync(md).toString();
+  },
+  getText(md) {
+    const mdast = getMdastRoot(md);
+    return (0, import_mdast_util_to_string.toString)(mdast);
+  }
+};
+function getMdastRoot(md) {
+  const mdast = unified().use(import_remark_parse.default).use(import_remark_gfm.default).use(import_remark_obsidian_link.remarkObsidianLink).parse(md);
+  return mdast;
+}
+
+// lib/mark/getSlug.ts
 var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
 function getSlug(s) {
   return (0, import_slugify.default)(s, { decamelize: false });
 }
 
-// lib/getTocData.ts
+// lib/mark/getTocData.ts
 var import_hast_util_from_html = require("hast-util-from-html");
 var import_hast_util_heading = require("hast-util-heading");
 var import_hast_util_to_text = require("hast-util-to-text");
@@ -1210,24 +1298,24 @@ function elixir(hljs) {
   };
 }
 
-// lib/presets.ts
+// lib/mark/presets.ts
 var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
 var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
 var import_rehype_slug = __toESM(require("rehype-slug"), 1);
 var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
-var import_remark_gfm = __toESM(require("remark-gfm"), 1);
-var import_remark_obsidian_link = require("remark-obsidian-link");
-var import_remark_parse = __toESM(require("remark-parse"), 1);
+var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
+var import_remark_obsidian_link2 = require("remark-obsidian-link");
+var import_remark_parse2 = __toESM(require("remark-parse"), 1);
 var import_remark_rehype = __toESM(require("remark-rehype"), 1);
 var import_remark_callouts = __toESM(require("remark-callouts"), 1);
 var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
 var presetBuilder = ({ toLink }) => {
   return {
     plugins: [
-      import_remark_parse.default,
+      import_remark_parse2.default,
       import_remark_callouts.default,
-      import_remark_gfm.default,
-      [import_remark_obsidian_link.remarkObsidianLink, { toLink }],
+      import_remark_gfm2.default,
+      [import_remark_obsidian_link2.remarkObsidianLink, { toLink }],
       import_remark_rehype.default,
       [import_rehype_external_links.default, { rel: ["nofollow"], target: "_blank" }],
       import_rehype_slug.default,
@@ -1237,20 +1325,8 @@ var presetBuilder = ({ toLink }) => {
     ]
   };
 };
-var preset = {
-  plugins: [
-    import_remark_parse.default,
-    import_remark_gfm.default,
-    import_remark_obsidian_link.remarkObsidianLink,
-    import_remark_rehype.default,
-    import_rehype_slug.default,
-    [import_rehype_autolink_headings.default, { behavior: "wrap" }],
-    [import_rehype_highlight.default, { languages: { elixir } }],
-    import_rehype_stringify.default
-  ]
-};
 
-// lib/obsidianLinkBuilder.ts
+// lib/mark/obsidianLinkBuilder.ts
 var Regex = {
   Alias: /.+\|.+/,
   InternalHeader: /^#[^\^]+/,
@@ -1295,7 +1371,7 @@ function obsidianLinkBuilder(wikiLink) {
   return out;
 }
 
-// lib/toLinkBuilder.ts
+// lib/mark/toLinkBuilder.ts
 function toLinkBuilder(pageAllowSet, getPageUri) {
   const toUri = function({ page, header }) {
     var _a;
@@ -1353,85 +1429,51 @@ function obLinkToLink(oLink, toUri) {
   }
 }
 
-// lib/metamark.ts
-function getFrontmatter(rawMd) {
-  const { data: frontmatter } = (0, import_gray_matter.default)(rawMd);
-  return frontmatter;
-}
-function getFirstParagraphText(md) {
-  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
-  const firstParagraph = mdast.children.find(
-    (child) => child.type === "paragraph"
-  );
-  return (0, import_mdast_util_to_string.toString)(firstParagraph);
-}
-function toText2(md) {
-  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
-  return (0, import_mdast_util_to_string.toString)(mdast);
-}
-function toHtml(md, preset2) {
-  return unified().use(preset2).processSync(md).toString();
-}
-function getPage(filePath) {
-  const { name: page } = import_path2.default.parse(filePath);
-  return page;
-}
-function getRawMd(filePath) {
-  return (0, import_fs.readFileSync)(filePath, "utf8");
-}
-function getMdNoFrontmatter(rawMd) {
-  const { content: md } = (0, import_gray_matter.default)(rawMd);
-  return md;
-}
-function getMark(filePath, pageAllowSet, options) {
-  var _a, _b;
-  const rawMd = getRawMd(filePath);
-  const page = getPage(filePath);
-  const md = getMdNoFrontmatter(rawMd);
-  const frontmatter = getFrontmatter(rawMd);
-  const getPageUri = (_b = (_a = options == null ? void 0 : options.getPageUriBuilder) == null ? void 0 : _a.call(options, { frontmatter })) != null ? _b : void 0;
-  const preset2 = presetBuilder({
-    toLink: toLinkBuilder(pageAllowSet, getPageUri)
-  });
-  const html = toHtml(md, preset2);
-  return {
-    page,
-    slug: getSlug(page),
-    toc: getTocData(html),
-    firstParagraphText: getFirstParagraphText(md),
-    frontmatter,
-    html,
-    text: toText2(md)
-  };
-}
-function getMarks(filePathList, pageAllowSet, options) {
-  const marks = [];
-  for (const filePath of filePathList) {
-    const page = getPage(filePath);
-    if (pageAllowSet.has(page)) {
-      marks.push(getMark(filePath, pageAllowSet, options));
+// lib/mark/index.ts
+var mark = {
+  getMark(filePath, pageAllowSet, options) {
+    var _a, _b;
+    const fileName = file.getFileName(filePath);
+    const md = file.getMd.fromFilePath(filePath);
+    const fm = file.getFm.fromFilePath(filePath);
+    const getPageUri = (_b = (_a = options == null ? void 0 : options.getPageUriBuilder) == null ? void 0 : _a.call(options, { frontmatter: fm })) != null ? _b : void 0;
+    const preset = presetBuilder({
+      toLink: toLinkBuilder(pageAllowSet, getPageUri)
+    });
+    const html = unified2.getHtml(md, preset);
+    const mark2 = {
+      page: fileName,
+      slug: getSlug(fileName),
+      toc: getTocData(html),
+      firstParagraphText: unified2.getFirstParagraphText(md),
+      frontmatter: fm,
+      html,
+      text: unified2.getText(md)
+    };
+    return mark2;
+  },
+  getMarks(filePathList, pageAllowSet, options) {
+    const marks = [];
+    for (const filePath of filePathList) {
+      const page = file.getFileName(filePath);
+      if (pageAllowSet.has(page)) {
+        marks.push(mark.getMark(filePath, pageAllowSet, options));
+      }
     }
+    return marks;
   }
-  return marks;
-}
-var Metamark = {
-  getFirstParagraphText,
-  getFrontmatter,
-  getMark,
-  getMarks,
-  getMdNoFrontmatter,
-  getRawMd,
-  getSlug,
-  getPage,
-  getTocData,
-  preset,
-  presetBuilder,
-  toHtml,
-  toText: toText2
+};
+
+// lib/index.ts
+var metamark = {
+  dir,
+  file,
+  unified: unified2,
+  mark
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Metamark
+  metamark
 });
 /*! Bundled license information:
 

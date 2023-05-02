@@ -1,5 +1,5 @@
 import matter from "gray-matter";
-import { nd, type Nd } from "../nd.js";
+import { nod, type Nod } from "../nod.js";
 import { unified } from "../unified/index.js";
 
 /**
@@ -24,39 +24,31 @@ export type Fm = { [key: string]: any };
  */
 export const file = {
   getRaw: {
-    /**
-     * will deprecate `m.getRawMd`
-     */
-    fromFilePath(filePath: string, n: Nd = nd): Raw {
+    fromFilePath(filePath: string, n: Nod = nod): Raw {
       return n.fs.readFileSync(filePath, "utf8");
     },
   },
   getMd: {
-    /**
-     * will deprecate `m.getMdNoFrontmatter`
-     */
-    fromContent(content: Raw): Md {
-      const { content: md } = matter(content);
+    fromRaw(raw: Raw): Md {
+      const { content: md } = matter(raw);
       return md as Md;
     },
     fromFilePath(filePath: string): Md {
       const content = file.getRaw.fromFilePath(filePath);
-      return file.getMd.fromContent(content);
+      return file.getMd.fromRaw(content);
     },
   },
   getFm: {
-    /** will deprecate `m.getFrontmatter` */
-    fromContent(content: Raw): Fm {
-      const { data: fm } = matter(content);
+    fromRaw(raw: Raw): Fm {
+      const { data: fm } = matter(raw);
       return fm as Fm;
     },
     fromFilePath(filePath: string): Fm {
       const content = file.getRaw.fromFilePath(filePath);
-      return file.getFm.fromContent(content);
+      return file.getFm.fromRaw(content);
     },
   },
-  /** will deprecate `m.getPage` */
-  getFileName(filePath: string, n: Nd = nd): string {
+  getFileName(filePath: string, n: Nod = nod): string {
     const { name } = n.path.parse(filePath);
     return name;
   },
