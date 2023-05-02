@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { Metamark } from "../lib/metamark";
+import { metamark as m } from "../lib/index.js";
 import { escapeRegExp } from "./utils.js";
 
 describe("Metamark.getMark", () => {
   it("works with defaults", () => {
     const pageAllowSet = new Set(["Wiki Link"]);
-    const actual = Metamark.getMark("./tests/Test File.md", pageAllowSet);
+    const actual = m.mark.getMark("./tests/Test File.md", pageAllowSet);
 
     expect(actual.page).toStrictEqual("Test File");
     expect(actual.slug).toStrictEqual("test-file");

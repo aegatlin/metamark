@@ -7,9 +7,6 @@ import { Md } from "../index.js";
 import { Root } from "mdast";
 
 export const unified = {
-  /**
-   * will deprecates `m.getFirstParagraphText`
-   */
   getFirstParagraphText(md: Md): string {
     const mdast = getMdastRoot(md);
 
@@ -19,9 +16,6 @@ export const unified = {
 
     return toString(firstParagraph);
   },
-  /**
-   * will deprecate `m.toHtml`
-   */
   getHtml(md: Md, preset: Preset): string {
     return u().use(preset).processSync(md).toString();
   },

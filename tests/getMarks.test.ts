@@ -1,15 +1,15 @@
 import { test, describe, it, expect } from "vitest";
-import { Metamark } from "../lib/metamark";
+import { metamark as m } from "../lib/index.js";
 
 test("pages NOT in pageAllowSet are NOT included", () => {
   const pageAllowSet = new Set(["Wiki Link"]);
-  const actuals = Metamark.getMarks(["./tests/Test File.md"], pageAllowSet);
+  const actuals = m.mark.getMarks(["./tests/Test File.md"], pageAllowSet);
   expect(actuals).toStrictEqual([]);
 });
 
 test("happy path with simple filePathsList and pageAllowSet", () => {
   const pageAllowSet = new Set(["Test File", "Wiki Link"]);
-  const actuals = Metamark.getMarks(["./tests/Test File.md"], pageAllowSet);
+  const actuals = m.mark.getMarks(["./tests/Test File.md"], pageAllowSet);
   const actual = actuals[0];
 
   expect(actual.page).toBe("Test File");
@@ -34,7 +34,7 @@ test("happy path with simple filePathsList and pageAllowSet", () => {
 
 test("removes links to files NOT in pageAllowSet", () => {
   const pageAllowSet = new Set(["Test File"]);
-  const actuals = Metamark.getMarks(["./tests/Test File.md"], pageAllowSet);
+  const actuals = m.mark.getMarks(["./tests/Test File.md"], pageAllowSet);
   const actual = actuals[0];
 
   expect(actual.html).toMatch(/This is a Wiki Link/);
@@ -45,7 +45,7 @@ test("removes links to files NOT in pageAllowSet", () => {
 
 it("accept custom get slug builder function", () => {
   const pageAllowSet = new Set(["Test File", "Wiki Link"]);
-  const actuals = Metamark.getMarks(["./tests/Test File.md"], pageAllowSet, {
+  const actuals = m.mark.getMarks(["./tests/Test File.md"], pageAllowSet, {
     getPageUriBuilder:
       ({ frontmatter }) =>
       (page, getSlug) => ({

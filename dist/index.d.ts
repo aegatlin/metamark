@@ -1,13 +1,12 @@
-import { Preset } from 'unified';
-
-declare function getSlug(s: string): string;
+import * as unified from 'unified';
+import * as path from 'path';
+import * as node_fs from 'node:fs';
 
 interface MetamarkTocItem {
     title: string;
     depth: number;
     id: string;
 }
-declare function getTocData(html: string): MetamarkTocItem[];
 
 declare type GetPageUri = (page: string, toSlug: (s: string) => string) => {
     uri: string;
@@ -19,15 +18,6 @@ declare type GetPageUriBuilder = (x: {
     };
 }) => GetPageUri;
 
-declare function getFrontmatter(rawMd: string): {
-    [key: string]: any;
-};
-declare function getFirstParagraphText(md: string): string;
-declare function toText(md: string): string;
-declare function toHtml(md: string, preset: Preset): string;
-declare function getPage(filePath: string): string;
-declare function getRawMd(filePath: string): string;
-declare function getMdNoFrontmatter(rawMd: string): string;
 interface GetMarksOptions {
     getPageUriBuilder?: GetPageUriBuilder;
 }
@@ -42,24 +32,71 @@ interface Mark {
     html: string;
     text: string;
 }
-declare function getMark(filePath: string, pageAllowSet: Set<string>, options?: GetMarksOptions): Mark;
-declare function getMarks(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions): Mark[];
-declare const Metamark: {
-    getFirstParagraphText: typeof getFirstParagraphText;
-    getFrontmatter: typeof getFrontmatter;
-    getMark: typeof getMark;
-    getMarks: typeof getMarks;
-    getMdNoFrontmatter: typeof getMdNoFrontmatter;
-    getRawMd: typeof getRawMd;
-    getSlug: typeof getSlug;
-    getPage: typeof getPage;
-    getTocData: typeof getTocData;
-    preset: Preset;
-    presetBuilder: ({ toLink }: {
-        toLink: any;
-    }) => Preset;
-    toHtml: typeof toHtml;
-    toText: typeof toText;
+
+/**
+ * `Raw` is the raw string of a file. It can
+ * contain stringified frontmatter, markdown, etc.
+ */
+declare type Raw = string;
+/**
+ * `Md` is a "true" md string, stripped of frontmatter,
+ * etc.
+ */
+declare type Md = string;
+/**
+ * `Fm` is frontmatter
+ */
+declare type Fm = {
+    [key: string]: any;
 };
 
-export { GetMarksOptions, Mark, Metamark, MetamarkTocItem };
+declare type ShouldAdd = (shouldAddInput: ShouldAddInput) => boolean;
+interface ShouldAddInput {
+    frontmatter: Fm;
+}
+
+declare const metamark: {
+    dir: {
+        process(dirPath: string, shouldAdd?: ShouldAdd, node?: {
+            fs: typeof node_fs;
+            path: path.PlatformPath;
+            process: NodeJS.Process;
+        }): {
+            filePaths: string[];
+            pageAllowSet: Set<string>;
+        };
+    };
+    file: {
+        getRaw: {
+            fromFilePath(filePath: string, n?: {
+                fs: typeof node_fs;
+                path: path.PlatformPath;
+                process: NodeJS.Process;
+            }): string;
+        };
+        getMd: {
+            fromRaw(raw: string): string;
+            fromFilePath(filePath: string): string;
+        };
+        getFm: {
+            fromRaw(raw: string): Fm;
+            fromFilePath(filePath: string): Fm;
+        };
+        getFileName(filePath: string, n?: {
+            fs: typeof node_fs;
+            path: path.PlatformPath;
+            process: NodeJS.Process;
+        }): string;
+    };
+    unified: {
+        getFirstParagraphText(md: string): string;
+        getHtml(md: string, preset: unified.Preset): string;
+        getText(md: string): string;
+    };
+    mark: {
+        getMark(filePath: string, pageAllowSet: Set<string>, options?: GetMarksOptions): Mark;
+        getMarks(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions): Mark[];
+    };
+};
+
+export { Fm, Mark, Md, Raw, ShouldAdd, metamark };

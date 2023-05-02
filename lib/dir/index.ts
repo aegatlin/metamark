@@ -1,11 +1,11 @@
-import { nd, Nd } from "../nd.js";
+import { nod, Nod } from "../nod.js";
 import { file, Fm } from "../file/index.js";
 
 export const dir = {
   process(
     dirPath: string,
     shouldAdd: ShouldAdd = defaultShouldAdd,
-    node: Nd = nd
+    node: Nod = nod
   ): { filePaths: string[]; pageAllowSet: Set<string> } {
     const dirEntries = node.fs.readdirSync(dirPath, { withFileTypes: true });
 
