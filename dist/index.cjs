@@ -138,6 +138,7 @@ __export(lib_exports, {
 module.exports = __toCommonJS(lib_exports);
 
 // lib/file/index.ts
+var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
 var import_gray_matter = __toESM(require("gray-matter"), 1);
 
 // lib/nod.ts
@@ -180,18 +181,21 @@ var file = {
   getFileName(filePath, n = nod) {
     const { name } = n.path.parse(filePath);
     return name;
+  },
+  getSlug(s) {
+    return (0, import_slugify.default)(s, { decamelize: false });
   }
 };
 
-// lib/dir/index.ts
-var dir = {
-  process(dirPath, shouldAdd = defaultShouldAdd, node = nod) {
-    const dirEntries = node.fs.readdirSync(dirPath, { withFileTypes: true });
+// lib/obsidian/vault/index.ts
+var vault = {
+  inspect(dirPath, shouldAdd = defaultShouldAdd, n = nod) {
+    const dirEntries = n.fs.readdirSync(dirPath, { withFileTypes: true });
     const pageAllowSet = /* @__PURE__ */ new Set();
     const filePaths = [];
     dirEntries.forEach((dirEntry) => {
       if (dirEntry.isFile()) {
-        const filePath = node.path.join(dirPath, dirEntry.name);
+        const filePath = n.path.join(dirPath, dirEntry.name);
         const page = file.getFileName(filePath);
         const frontmatter = file.getFm.fromFilePath(filePath);
         if (shouldAdd({ frontmatter })) {
@@ -205,11 +209,316 @@ var dir = {
 };
 var defaultShouldAdd = ({ frontmatter }) => !!(frontmatter == null ? void 0 : frontmatter.public);
 
-// lib/unified/index.ts
-var import_mdast_util_to_string = require("mdast-util-to-string");
+// node_modules/highlight.js/es/languages/elixir.js
+function elixir(hljs) {
+  const regex = hljs.regex;
+  const ELIXIR_IDENT_RE = "[a-zA-Z_][a-zA-Z0-9_.]*(!|\\?)?";
+  const ELIXIR_METHOD_RE = "[a-zA-Z_]\\w*[!?=]?|[-+~]@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?";
+  const KEYWORDS = [
+    "after",
+    "alias",
+    "and",
+    "case",
+    "catch",
+    "cond",
+    "defstruct",
+    "defguard",
+    "do",
+    "else",
+    "end",
+    "fn",
+    "for",
+    "if",
+    "import",
+    "in",
+    "not",
+    "or",
+    "quote",
+    "raise",
+    "receive",
+    "require",
+    "reraise",
+    "rescue",
+    "try",
+    "unless",
+    "unquote",
+    "unquote_splicing",
+    "use",
+    "when",
+    "with|0"
+  ];
+  const LITERALS = [
+    "false",
+    "nil",
+    "true"
+  ];
+  const KWS = {
+    $pattern: ELIXIR_IDENT_RE,
+    keyword: KEYWORDS,
+    literal: LITERALS
+  };
+  const SUBST = {
+    className: "subst",
+    begin: /#\{/,
+    end: /\}/,
+    keywords: KWS
+  };
+  const NUMBER = {
+    className: "number",
+    begin: "(\\b0o[0-7_]+)|(\\b0b[01_]+)|(\\b0x[0-9a-fA-F_]+)|(-?\\b[0-9][0-9_]*(\\.[0-9_]+([eE][-+]?[0-9]+)?)?)",
+    relevance: 0
+  };
+  const ESCAPES_RE = /\\[\s\S]/;
+  const BACKSLASH_ESCAPE = {
+    match: ESCAPES_RE,
+    scope: "char.escape",
+    relevance: 0
+  };
+  const SIGIL_DELIMITERS = `[/|([{<"']`;
+  const SIGIL_DELIMITER_MODES = [
+    {
+      begin: /"/,
+      end: /"/
+    },
+    {
+      begin: /'/,
+      end: /'/
+    },
+    {
+      begin: /\//,
+      end: /\//
+    },
+    {
+      begin: /\|/,
+      end: /\|/
+    },
+    {
+      begin: /\(/,
+      end: /\)/
+    },
+    {
+      begin: /\[/,
+      end: /\]/
+    },
+    {
+      begin: /\{/,
+      end: /\}/
+    },
+    {
+      begin: /</,
+      end: />/
+    }
+  ];
+  const escapeSigilEnd = (end) => {
+    return {
+      scope: "char.escape",
+      begin: regex.concat(/\\/, end),
+      relevance: 0
+    };
+  };
+  const LOWERCASE_SIGIL = {
+    className: "string",
+    begin: "~[a-z](?=" + SIGIL_DELIMITERS + ")",
+    contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
+      x,
+      { contains: [
+        escapeSigilEnd(x.end),
+        BACKSLASH_ESCAPE,
+        SUBST
+      ] }
+    ))
+  };
+  const UPCASE_SIGIL = {
+    className: "string",
+    begin: "~[A-Z](?=" + SIGIL_DELIMITERS + ")",
+    contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
+      x,
+      { contains: [escapeSigilEnd(x.end)] }
+    ))
+  };
+  const REGEX_SIGIL = {
+    className: "regex",
+    variants: [
+      {
+        begin: "~r(?=" + SIGIL_DELIMITERS + ")",
+        contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
+          x,
+          {
+            end: regex.concat(x.end, /[uismxfU]{0,7}/),
+            contains: [
+              escapeSigilEnd(x.end),
+              BACKSLASH_ESCAPE,
+              SUBST
+            ]
+          }
+        ))
+      },
+      {
+        begin: "~R(?=" + SIGIL_DELIMITERS + ")",
+        contains: SIGIL_DELIMITER_MODES.map(
+          (x) => hljs.inherit(
+            x,
+            {
+              end: regex.concat(x.end, /[uismxfU]{0,7}/),
+              contains: [escapeSigilEnd(x.end)]
+            }
+          )
+        )
+      }
+    ]
+  };
+  const STRING = {
+    className: "string",
+    contains: [
+      hljs.BACKSLASH_ESCAPE,
+      SUBST
+    ],
+    variants: [
+      {
+        begin: /"""/,
+        end: /"""/
+      },
+      {
+        begin: /'''/,
+        end: /'''/
+      },
+      {
+        begin: /~S"""/,
+        end: /"""/,
+        contains: []
+        // override default
+      },
+      {
+        begin: /~S"/,
+        end: /"/,
+        contains: []
+        // override default
+      },
+      {
+        begin: /~S'''/,
+        end: /'''/,
+        contains: []
+        // override default
+      },
+      {
+        begin: /~S'/,
+        end: /'/,
+        contains: []
+        // override default
+      },
+      {
+        begin: /'/,
+        end: /'/
+      },
+      {
+        begin: /"/,
+        end: /"/
+      }
+    ]
+  };
+  const FUNCTION = {
+    className: "function",
+    beginKeywords: "def defp defmacro defmacrop",
+    end: /\B\b/,
+    // the mode is ended by the title
+    contains: [
+      hljs.inherit(hljs.TITLE_MODE, {
+        begin: ELIXIR_IDENT_RE,
+        endsParent: true
+      })
+    ]
+  };
+  const CLASS = hljs.inherit(FUNCTION, {
+    className: "class",
+    beginKeywords: "defimpl defmodule defprotocol defrecord",
+    end: /\bdo\b|$|;/
+  });
+  const ELIXIR_DEFAULT_CONTAINS = [
+    STRING,
+    REGEX_SIGIL,
+    UPCASE_SIGIL,
+    LOWERCASE_SIGIL,
+    hljs.HASH_COMMENT_MODE,
+    CLASS,
+    FUNCTION,
+    { begin: "::" },
+    {
+      className: "symbol",
+      begin: ":(?![\\s:])",
+      contains: [
+        STRING,
+        { begin: ELIXIR_METHOD_RE }
+      ],
+      relevance: 0
+    },
+    {
+      className: "symbol",
+      begin: ELIXIR_IDENT_RE + ":(?!:)",
+      relevance: 0
+    },
+    {
+      // Usage of a module, struct, etc.
+      className: "title.class",
+      begin: /(\b[A-Z][a-zA-Z0-9_]+)/,
+      relevance: 0
+    },
+    NUMBER,
+    {
+      className: "variable",
+      begin: "(\\$\\W)|((\\$|@@?)(\\w+))"
+    }
+    // -> has been removed, capnproto always uses this grammar construct
+  ];
+  SUBST.contains = ELIXIR_DEFAULT_CONTAINS;
+  return {
+    name: "Elixir",
+    aliases: [
+      "ex",
+      "exs"
+    ],
+    keywords: KWS,
+    contains: ELIXIR_DEFAULT_CONTAINS
+  };
+}
+
+// lib/unified/presetBuilder.ts
+var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
+var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
+var import_rehype_slug = __toESM(require("rehype-slug"), 1);
+var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
 var import_remark_gfm = __toESM(require("remark-gfm"), 1);
 var import_remark_obsidian_link = require("remark-obsidian-link");
 var import_remark_parse = __toESM(require("remark-parse"), 1);
+var import_remark_rehype = __toESM(require("remark-rehype"), 1);
+var import_remark_callouts = __toESM(require("remark-callouts"), 1);
+var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
+var presetBuilder = ({ wikiLinkToMdastLink }) => {
+  return {
+    plugins: [
+      import_remark_parse.default,
+      import_remark_callouts.default,
+      import_remark_gfm.default,
+      [import_remark_obsidian_link.remarkObsidianLink, { toLink: wikiLinkToMdastLink }],
+      import_remark_rehype.default,
+      [import_rehype_external_links.default, { rel: ["nofollow"], target: "_blank" }],
+      import_rehype_slug.default,
+      [import_rehype_autolink_headings.default, { behavior: "wrap" }],
+      [import_rehype_highlight.default, { languages: { elixir } }],
+      import_rehype_stringify.default
+    ]
+  };
+};
+
+// lib/obsidian/index.ts
+var obsidian = {
+  vault
+};
+
+// lib/unified/index.ts
+var import_mdast_util_to_string = require("mdast-util-to-string");
+var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
+var import_remark_obsidian_link2 = require("remark-obsidian-link");
+var import_remark_parse2 = __toESM(require("remark-parse"), 1);
 
 // node_modules/bail/index.js
 function bail(error) {
@@ -978,35 +1287,7 @@ function looksLikeAVFileValue(value) {
   return typeof value === "string" || (0, import_is_buffer2.default)(value);
 }
 
-// lib/unified/index.ts
-var unified2 = {
-  getFirstParagraphText(md) {
-    const mdast = getMdastRoot(md);
-    const firstParagraph = mdast.children.find(
-      (child) => child.type === "paragraph"
-    );
-    return (0, import_mdast_util_to_string.toString)(firstParagraph);
-  },
-  getHtml(md, preset) {
-    return unified().use(preset).processSync(md).toString();
-  },
-  getText(md) {
-    const mdast = getMdastRoot(md);
-    return (0, import_mdast_util_to_string.toString)(mdast);
-  }
-};
-function getMdastRoot(md) {
-  const mdast = unified().use(import_remark_parse.default).use(import_remark_gfm.default).use(import_remark_obsidian_link.remarkObsidianLink).parse(md);
-  return mdast;
-}
-
-// lib/mark/getSlug.ts
-var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
-function getSlug(s) {
-  return (0, import_slugify.default)(s, { decamelize: false });
-}
-
-// lib/mark/getTocData.ts
+// lib/unified/getTocData.ts
 var import_hast_util_from_html = require("hast-util-from-html");
 var import_hast_util_heading = require("hast-util-heading");
 var import_hast_util_to_text = require("hast-util-to-text");
@@ -1026,425 +1307,41 @@ function getTocData(html) {
   return flatToc;
 }
 
-// node_modules/highlight.js/es/languages/elixir.js
-function elixir(hljs) {
-  const regex = hljs.regex;
-  const ELIXIR_IDENT_RE = "[a-zA-Z_][a-zA-Z0-9_.]*(!|\\?)?";
-  const ELIXIR_METHOD_RE = "[a-zA-Z_]\\w*[!?=]?|[-+~]@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?";
-  const KEYWORDS = [
-    "after",
-    "alias",
-    "and",
-    "case",
-    "catch",
-    "cond",
-    "defstruct",
-    "defguard",
-    "do",
-    "else",
-    "end",
-    "fn",
-    "for",
-    "if",
-    "import",
-    "in",
-    "not",
-    "or",
-    "quote",
-    "raise",
-    "receive",
-    "require",
-    "reraise",
-    "rescue",
-    "try",
-    "unless",
-    "unquote",
-    "unquote_splicing",
-    "use",
-    "when",
-    "with|0"
-  ];
-  const LITERALS = [
-    "false",
-    "nil",
-    "true"
-  ];
-  const KWS = {
-    $pattern: ELIXIR_IDENT_RE,
-    keyword: KEYWORDS,
-    literal: LITERALS
-  };
-  const SUBST = {
-    className: "subst",
-    begin: /#\{/,
-    end: /\}/,
-    keywords: KWS
-  };
-  const NUMBER = {
-    className: "number",
-    begin: "(\\b0o[0-7_]+)|(\\b0b[01_]+)|(\\b0x[0-9a-fA-F_]+)|(-?\\b[0-9][0-9_]*(\\.[0-9_]+([eE][-+]?[0-9]+)?)?)",
-    relevance: 0
-  };
-  const ESCAPES_RE = /\\[\s\S]/;
-  const BACKSLASH_ESCAPE = {
-    match: ESCAPES_RE,
-    scope: "char.escape",
-    relevance: 0
-  };
-  const SIGIL_DELIMITERS = `[/|([{<"']`;
-  const SIGIL_DELIMITER_MODES = [
-    {
-      begin: /"/,
-      end: /"/
-    },
-    {
-      begin: /'/,
-      end: /'/
-    },
-    {
-      begin: /\//,
-      end: /\//
-    },
-    {
-      begin: /\|/,
-      end: /\|/
-    },
-    {
-      begin: /\(/,
-      end: /\)/
-    },
-    {
-      begin: /\[/,
-      end: /\]/
-    },
-    {
-      begin: /\{/,
-      end: /\}/
-    },
-    {
-      begin: /</,
-      end: />/
-    }
-  ];
-  const escapeSigilEnd = (end) => {
-    return {
-      scope: "char.escape",
-      begin: regex.concat(/\\/, end),
-      relevance: 0
-    };
-  };
-  const LOWERCASE_SIGIL = {
-    className: "string",
-    begin: "~[a-z](?=" + SIGIL_DELIMITERS + ")",
-    contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
-      x,
-      { contains: [
-        escapeSigilEnd(x.end),
-        BACKSLASH_ESCAPE,
-        SUBST
-      ] }
-    ))
-  };
-  const UPCASE_SIGIL = {
-    className: "string",
-    begin: "~[A-Z](?=" + SIGIL_DELIMITERS + ")",
-    contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
-      x,
-      { contains: [escapeSigilEnd(x.end)] }
-    ))
-  };
-  const REGEX_SIGIL = {
-    className: "regex",
-    variants: [
-      {
-        begin: "~r(?=" + SIGIL_DELIMITERS + ")",
-        contains: SIGIL_DELIMITER_MODES.map((x) => hljs.inherit(
-          x,
-          {
-            end: regex.concat(x.end, /[uismxfU]{0,7}/),
-            contains: [
-              escapeSigilEnd(x.end),
-              BACKSLASH_ESCAPE,
-              SUBST
-            ]
-          }
-        ))
-      },
-      {
-        begin: "~R(?=" + SIGIL_DELIMITERS + ")",
-        contains: SIGIL_DELIMITER_MODES.map(
-          (x) => hljs.inherit(
-            x,
-            {
-              end: regex.concat(x.end, /[uismxfU]{0,7}/),
-              contains: [escapeSigilEnd(x.end)]
-            }
-          )
-        )
-      }
-    ]
-  };
-  const STRING = {
-    className: "string",
-    contains: [
-      hljs.BACKSLASH_ESCAPE,
-      SUBST
-    ],
-    variants: [
-      {
-        begin: /"""/,
-        end: /"""/
-      },
-      {
-        begin: /'''/,
-        end: /'''/
-      },
-      {
-        begin: /~S"""/,
-        end: /"""/,
-        contains: []
-        // override default
-      },
-      {
-        begin: /~S"/,
-        end: /"/,
-        contains: []
-        // override default
-      },
-      {
-        begin: /~S'''/,
-        end: /'''/,
-        contains: []
-        // override default
-      },
-      {
-        begin: /~S'/,
-        end: /'/,
-        contains: []
-        // override default
-      },
-      {
-        begin: /'/,
-        end: /'/
-      },
-      {
-        begin: /"/,
-        end: /"/
-      }
-    ]
-  };
-  const FUNCTION = {
-    className: "function",
-    beginKeywords: "def defp defmacro defmacrop",
-    end: /\B\b/,
-    // the mode is ended by the title
-    contains: [
-      hljs.inherit(hljs.TITLE_MODE, {
-        begin: ELIXIR_IDENT_RE,
-        endsParent: true
-      })
-    ]
-  };
-  const CLASS = hljs.inherit(FUNCTION, {
-    className: "class",
-    beginKeywords: "defimpl defmodule defprotocol defrecord",
-    end: /\bdo\b|$|;/
-  });
-  const ELIXIR_DEFAULT_CONTAINS = [
-    STRING,
-    REGEX_SIGIL,
-    UPCASE_SIGIL,
-    LOWERCASE_SIGIL,
-    hljs.HASH_COMMENT_MODE,
-    CLASS,
-    FUNCTION,
-    { begin: "::" },
-    {
-      className: "symbol",
-      begin: ":(?![\\s:])",
-      contains: [
-        STRING,
-        { begin: ELIXIR_METHOD_RE }
-      ],
-      relevance: 0
-    },
-    {
-      className: "symbol",
-      begin: ELIXIR_IDENT_RE + ":(?!:)",
-      relevance: 0
-    },
-    {
-      // Usage of a module, struct, etc.
-      className: "title.class",
-      begin: /(\b[A-Z][a-zA-Z0-9_]+)/,
-      relevance: 0
-    },
-    NUMBER,
-    {
-      className: "variable",
-      begin: "(\\$\\W)|((\\$|@@?)(\\w+))"
-    }
-    // -> has been removed, capnproto always uses this grammar construct
-  ];
-  SUBST.contains = ELIXIR_DEFAULT_CONTAINS;
-  return {
-    name: "Elixir",
-    aliases: [
-      "ex",
-      "exs"
-    ],
-    keywords: KWS,
-    contains: ELIXIR_DEFAULT_CONTAINS
-  };
-}
-
-// lib/mark/presets.ts
-var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
-var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
-var import_rehype_slug = __toESM(require("rehype-slug"), 1);
-var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
-var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
-var import_remark_obsidian_link2 = require("remark-obsidian-link");
-var import_remark_parse2 = __toESM(require("remark-parse"), 1);
-var import_remark_rehype = __toESM(require("remark-rehype"), 1);
-var import_remark_callouts = __toESM(require("remark-callouts"), 1);
-var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
-var presetBuilder = ({ toLink }) => {
-  return {
-    plugins: [
-      import_remark_parse2.default,
-      import_remark_callouts.default,
-      import_remark_gfm2.default,
-      [import_remark_obsidian_link2.remarkObsidianLink, { toLink }],
-      import_remark_rehype.default,
-      [import_rehype_external_links.default, { rel: ["nofollow"], target: "_blank" }],
-      import_rehype_slug.default,
-      [import_rehype_autolink_headings.default, { behavior: "wrap" }],
-      [import_rehype_highlight.default, { languages: { elixir } }],
-      import_rehype_stringify.default
-    ]
-  };
+// lib/unified/index.ts
+var unified2 = {
+  getTocData,
+  getFirstParagraphText(md) {
+    const mdast = getMdastRoot(md);
+    const firstParagraph = mdast.children.find(
+      (child) => child.type === "paragraph"
+    );
+    return (0, import_mdast_util_to_string.toString)(firstParagraph);
+  },
+  getHtml(md, preset) {
+    return unified().use(preset).processSync(md).toString();
+  },
+  getText(md) {
+    const mdast = getMdastRoot(md);
+    return (0, import_mdast_util_to_string.toString)(mdast);
+  },
+  presetBuilder
 };
-
-// lib/mark/obsidianLinkBuilder.ts
-var Regex = {
-  Alias: /.+\|.+/,
-  InternalHeader: /^#[^\^]+/,
-  InternalBlock: /^#\^.+/,
-  ExternalHeader: /.+#[^\^]+/,
-  ExternalBlock: /.+#\^.+/
-};
-function parseWikiLinkString(wikiLinkString) {
-  const content = wikiLinkString.slice(2, -2);
-  if (Regex.Alias.test(content)) {
-    let [value, alias] = content.split("|");
-    return { value: value.trim(), alias: alias.trim() };
-  } else {
-    return { value: content.trim() };
-  }
-}
-function obsidianLinkBuilder(wikiLink) {
-  const { value, alias } = typeof wikiLink === "string" ? parseWikiLinkString(wikiLink) : wikiLink;
-  let out = {};
-  if (alias)
-    out["alias"] = alias;
-  if (Regex.InternalHeader.test(value)) {
-    out["type"] = "header" /* Header */;
-    out["header"] = value.slice(1);
-  } else if (Regex.InternalBlock.test(value)) {
-    out["type"] = "block" /* Block */;
-    out["block"] = value.slice(2);
-  } else if (Regex.ExternalHeader.test(value)) {
-    const [page, header] = value.split("#");
-    out["type"] = "page-header" /* PageHeader */;
-    out["page"] = page;
-    out["header"] = header;
-  } else if (Regex.ExternalBlock.test(value)) {
-    const [page, block] = value.split("#^");
-    out["type"] = "page-block" /* PageBlock */;
-    out["page"] = page;
-    out["block"] = block;
-  } else {
-    out["type"] = "page" /* Page */;
-    out["page"] = value;
-  }
-  return out;
+function getMdastRoot(md) {
+  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
+  return mdast;
 }
 
-// lib/mark/toLinkBuilder.ts
-function toLinkBuilder(pageAllowSet, getPageUri) {
-  const toUri = function({ page, header }) {
-    var _a;
-    let headerPart = header ? `#${getSlug(header)}` : "";
-    let pagePart = null;
-    if (page) {
-      const { uri: pageURI, slug: pageSlug } = (_a = getPageUri == null ? void 0 : getPageUri(page, getSlug)) != null ? _a : {
-        uri: "/content",
-        slug: getSlug(page)
-      };
-      pagePart = page ? `${pageURI}/${pageSlug}` : "";
-    }
-    if (pagePart && pageAllowSet.has(page)) {
-      return header ? `${pagePart}${headerPart}` : pagePart;
-    }
-    return header ? headerPart : "";
-  };
-  const toLink = function(wikiLink) {
-    const obLink = obsidianLinkBuilder(wikiLink);
-    const link = obLinkToLink(obLink, toUri);
-    return link;
-  };
-  return toLink;
-}
-function obLinkToLink(oLink, toUri) {
-  switch (oLink.type) {
-    case "page" /* Page */: {
-      const { alias, page } = oLink;
-      const value = alias || page;
-      const uri = toUri({ page });
-      return uri ? { value, uri } : value;
-    }
-    case "page-header" /* PageHeader */: {
-      const { alias, page, header } = oLink;
-      const value = alias || `${page}#${header}`;
-      const uri = toUri({ page, header });
-      return uri ? { value, uri } : value;
-    }
-    case "page-block" /* PageBlock */: {
-      const { alias, page } = oLink;
-      const value = alias || page;
-      const uri = toUri({ page });
-      return uri ? { value, uri } : value;
-    }
-    case "header" /* Header */: {
-      const { alias, header } = oLink;
-      const value = alias || header;
-      const uri = toUri({ header });
-      return { value, uri };
-    }
-    case "block" /* Block */: {
-      const { alias } = oLink;
-      return alias || "";
-    }
-  }
-}
-
-// lib/mark/index.ts
+// lib/obsidian/mark/index.ts
 var mark = {
-  getMark(filePath, pageAllowSet, options) {
-    var _a, _b;
+  getMark(filePath, pageAllowSet, config, options) {
     const fileName = file.getFileName(filePath);
     const md = file.getMd.fromFilePath(filePath);
     const fm = file.getFm.fromFilePath(filePath);
-    const getPageUri = (_b = (_a = options == null ? void 0 : options.getPageUriBuilder) == null ? void 0 : _a.call(options, { frontmatter: fm })) != null ? _b : void 0;
-    const preset = presetBuilder({
-      toLink: toLinkBuilder(pageAllowSet, getPageUri)
-    });
-    const html = unified2.getHtml(md, preset);
+    const html = unified2.getHtml(md, config.preset);
     const mark2 = {
       page: fileName,
-      slug: getSlug(fileName),
-      toc: getTocData(html),
+      slug: file.getSlug(fileName),
+      toc: unified2.getTocData(html),
       firstParagraphText: unified2.getFirstParagraphText(md),
       frontmatter: fm,
       html,
@@ -1452,12 +1349,12 @@ var mark = {
     };
     return mark2;
   },
-  getMarks(filePathList, pageAllowSet, options) {
+  getMarks(filePathList, pageAllowSet, config, options) {
     const marks = [];
     for (const filePath of filePathList) {
       const page = file.getFileName(filePath);
       if (pageAllowSet.has(page)) {
-        marks.push(mark.getMark(filePath, pageAllowSet, options));
+        marks.push(mark.getMark(filePath, pageAllowSet, config));
       }
     }
     return marks;
@@ -1466,7 +1363,7 @@ var mark = {
 
 // lib/index.ts
 var metamark = {
-  dir,
+  dir: obsidian,
   file,
   unified: unified2,
   mark

@@ -7,5 +7,5 @@
     "skipLibCheck": true,
     "declaration": true
   },
-  "include": ["lib/**/*"]
+  "include": ["old/**/*"]
 }

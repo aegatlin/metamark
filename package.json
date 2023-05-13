@@ -35,11 +35,13 @@
     "remark-obsidian-link": "^0.3.0",
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
+    "underscore": "^1.13.6",
     "unist-util-visit": "^4.1.1"
   },
   "devDependencies": {
     "@types/hast": "^2.3.4",
     "@types/node": "^18.7.23",
+    "@types/underscore": "^1.11.4",
     "mdast": "^3.0.0",
     "prettier": "^2.7.1",
     "tsup": "^6.7.0",
