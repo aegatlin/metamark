@@ -7,12 +7,13 @@ import {
   buildDefaultPresetConfig,
   defaultPreset,
 } from "./unified.defaultPreset";
+import { fileProcess } from "./file.process";
 
 export function obsidianVaultProcess(
   dirPath: string,
   opts?: Partial<Metamark.Obsidian.Vault.ProcessOptions>
 ): Metamark.Obsidian.Vault.Data {
-  const _config = buildConfig(opts);
+  const config = buildConfig(opts);
   const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
 
   const pageAllowSet = new Set<string>();
@@ -24,14 +25,26 @@ export function obsidianVaultProcess(
       const page = getFileName(filePath);
       const { frontmatter } = getFrontmatterAndMd(filePath);
 
-      if (_config.shouldIncludeFile({ frontmatter })) {
+      if (config.shouldIncludeFile({ frontmatter })) {
         pageAllowSet.add(page);
         filePaths.push(filePath);
       }
     }
   });
 
-  return { filePaths, pageAllowSet, config: _config };
+  const pages: Metamark.File.Data[] = [];
+
+  for (const filePath of filePaths) {
+    const page = getFileName(filePath);
+    if (pageAllowSet.has(page)) {
+      const page = fileProcess(filePath, {
+        unified: config.unifiedPreset,
+      });
+      pages.push(page);
+    }
+  }
+
+  return { filePaths, pageAllowSet, pages };
 }
 
 function buildConfig(
