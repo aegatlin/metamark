@@ -42,6 +42,7 @@
     "@types/hast": "^2.3.4",
     "@types/node": "^18.7.23",
     "@types/underscore": "^1.11.4",
+    "hastscript": "^7.2.0",
     "mdast": "^3.0.0",
     "prettier": "^2.7.1",
     "tsup": "^6.7.0",

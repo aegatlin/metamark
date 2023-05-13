@@ -29,7 +29,7 @@ export namespace Metamark {
       export interface Data {
         filePaths: string[];
         pageAllowSet: Set<string>;
-        config: Config;
+        pages: File.Data[];
       }
 
       export interface Config {
@@ -62,12 +62,16 @@ export namespace Metamark {
          * If you don't trust the sources you are linking to (e.g., they are user
          * defined), consider `rel=nofollow`. If you want to force users to open
          * links in new tabs, consider `target=_blank`.
+         *
+         * https://github.com/rehypejs/rehype-external-links
          */
         rehypeExternalLinks: {
           options: RehypeExternalLinksOptions;
         };
         /**
          * defaults to `{ behavior: "wrap" }`
+
+         * https://github.com/rehypejs/rehype-autolink-headings
          */
         rehypeAutolinkHeadings: {
           options: RehypeAutolinkHeadingsOptions;
