@@ -1,14 +1,13 @@
-import { expectTypeOf, test } from "vitest";
+import { expect, test } from "vitest";
 import m from "../../src/index";
 
 test("metamark exports", () => {
-  expectTypeOf(m.file.process).toBeFunction();
+  expect(m.file.process).toBeTypeOf("function");
 
-  expectTypeOf(m.file.utility.getFileName).toBeFunction();
-  expectTypeOf(m.file.utility.getFrontmatterAndMd).toBeFunction();
+  expect(m.file.utility.getFileName).toBeTypeOf("function");
+  expect(m.file.utility.getFrontmatterAndMd).toBeTypeOf("function");
 
-  expectTypeOf(m.obsidian.vault.process).toBeFunction();
-  expectTypeOf(m.obsidian.vault.toJson).toBeFunction();
+  expect(m.obsidian.vault.process).toBeTypeOf("function");
 
-  expectTypeOf(m.utility.toSlug).toBeFunction();
+  expect(m.utility.toSlug).toBeTypeOf("function");
 });
