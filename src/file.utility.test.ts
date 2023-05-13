@@ -1,7 +1,5 @@
 import { expect, test } from "vitest";
-import { getFileName, getFrontmatterAndMd } from "./file.process";
-
-// `fileProcess` is testing in ./tests/integrations/file.test.ts
+import { getFileName, getFrontmatterAndMd } from "./file.utility.js";
 
 function setup() {
   const filePath = "./tests/testMds/Test File.md";

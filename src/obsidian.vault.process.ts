@@ -1,13 +1,18 @@
-import path from "node:path";
-import { Metamark } from "./types";
 import fs from "node:fs";
-import { getFileName, getFrontmatterAndMd } from "./file.process.js";
-import { unifiedDefaultPresetConfig } from "./unified.defaultPresetConfig";
+import path from "node:path";
+import { getFileName, getFrontmatterAndMd } from "./file.utility";
+import { Metamark } from "./types";
+import { isPreset } from "./unified.utility";
+import {
+  buildDefaultPresetConfig,
+  defaultPreset,
+} from "./unified.defaultPreset";
 
 export function obsidianVaultProcess(
   dirPath: string,
-  config: Metamark.Obsidian.VaultConfig = defaultConfig()
-): Metamark.Obsidian.Vault {
+  opts?: Partial<Metamark.Obsidian.Vault.ProcessOptions>
+): Metamark.Obsidian.Vault.Data {
+  const _config = buildConfig(opts);
   const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
 
   const pageAllowSet = new Set<string>();
@@ -19,21 +24,33 @@ export function obsidianVaultProcess(
       const page = getFileName(filePath);
       const { frontmatter } = getFrontmatterAndMd(filePath);
 
-      if (config.shouldIncludeFile({ frontmatter })) {
+      if (_config.shouldIncludeFile({ frontmatter })) {
         pageAllowSet.add(page);
         filePaths.push(filePath);
       }
     }
   });
 
-  return { filePaths, pageAllowSet, config };
+  return { filePaths, pageAllowSet, config: _config };
 }
 
-function defaultConfig(): Metamark.Obsidian.VaultConfig {
-  const config: Metamark.Obsidian.VaultConfig = {
-    shouldIncludeFile: ({ frontmatter }) => !!frontmatter?.public,
-    unifiedConfig: unifiedDefaultPresetConfig(),
-  };
+function buildConfig(
+  opts?: Metamark.Obsidian.Vault.ProcessOptions
+): Metamark.Obsidian.Vault.Config {
+  const shouldIncludeFile =
+    opts?.shouldIncludeFile ?? (({ frontmatter }) => !!frontmatter.public);
 
-  return config;
+  if (opts?.unified) {
+    if (isPreset(opts.unified)) {
+      return { shouldIncludeFile, unifiedPreset: opts.unified };
+    } else {
+      const config = buildDefaultPresetConfig(opts.unified);
+      const preset = defaultPreset(config);
+      return { shouldIncludeFile, unifiedPreset: preset };
+    }
+  } else {
+    const config = buildDefaultPresetConfig();
+    const preset = defaultPreset(config);
+    return { shouldIncludeFile, unifiedPreset: preset };
+  }
 }
