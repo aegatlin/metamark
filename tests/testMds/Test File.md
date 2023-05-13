@@ -13,7 +13,7 @@ I am a markdown file!
 
 This is a [[Wiki Link]].
 
-This is an [external link](http://www.google.com).
+This is an [external link](https://www.google.com).
 
 ## More
 

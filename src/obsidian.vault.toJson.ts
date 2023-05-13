@@ -1,14 +1,17 @@
-import { fileProcess, getFileName } from "./file.process.js";
+import { fileProcess } from "./file.process.js";
+import { getFileName } from "./file.utility.js";
 import { Metamark } from "./types.js";
 
-export function obsidianVaultToJson(vault: Metamark.Obsidian.Vault): string {
-  const pages: Metamark.File[] = [];
+export function obsidianVaultToJson(
+  vaultData: Metamark.Obsidian.Vault.Data
+): string {
+  const pages: Metamark.File.Data[] = [];
 
-  for (const filePath of vault.filePaths) {
+  for (const filePath of vaultData.filePaths) {
     const page = getFileName(filePath);
-    if (vault.pageAllowSet.has(page)) {
+    if (vaultData.pageAllowSet.has(page)) {
       const page = fileProcess(filePath, {
-        unifiedConfig: vault.config.unifiedConfig,
+        unified: vaultData.config.unifiedPreset,
       });
       pages.push(page);
     }

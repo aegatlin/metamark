@@ -1,21 +1,13 @@
 import { Link, ToLink, WikiLink } from "remark-obsidian-link";
+import { Preset } from "unified";
 import { Metamark } from "./types";
-import { toSlug } from "./toSlug";
+import { toSlug } from "./utility";
 
-export function unifiedDefaultPresetConfig(): Metamark.UnifiedDefaultPresetConfig {
-  const unifiedDefaultPresetConfig: Metamark.UnifiedDefaultPresetConfig = {
-    remarkObsidianLink: {
-      toLink,
-    },
-    rehypeExternalLinks: {
-      shouldOpenInNewTab: false,
-    },
-  };
-
-  return unifiedDefaultPresetConfig;
+export function isPreset(config: Metamark.Unified.Options): config is Preset {
+  return !!config?.plugins || !!config?.settings;
 }
 
-const toLink: ToLink = (wikiLink: WikiLink): Link => {
+export const toLink: ToLink = (wikiLink: WikiLink): Link => {
   const obsidianLink = wikiToObsidian(wikiLink);
 
   return {
@@ -27,13 +19,13 @@ const toLink: ToLink = (wikiLink: WikiLink): Link => {
 function toMdastUri(ol: ObsidianLink): string {
   switch (ol.type) {
     case "page":
-      return `content/${toSlug(ol.page)}`;
+      return `/content/${toSlug(ol.page)}`;
     case "page-header":
-      return `content/${toSlug(ol.page)}#${toSlug(ol.header)}`;
+      return `/content/${toSlug(ol.page)}#${toSlug(ol.header)}`;
     case "page-block":
-      return `content/${toSlug(ol.page)}`;
+      return `/content/${toSlug(ol.page)}`;
     case "header":
-      return `content/${toSlug(ol.header)}`;
+      return `#${toSlug(ol.header)}`;
     case "block":
       return "";
   }
@@ -59,7 +51,7 @@ function toMdastValue(ol: ObsidianLink): string {
   }
 }
 
-function wikiToObsidian(wikiLink: WikiLink): ObsidianLink {
+export function wikiToObsidian(wikiLink: WikiLink): ObsidianLink {
   const { value, alias } = wikiLink;
 
   switch (true) {
@@ -171,7 +163,7 @@ interface BlockOnly extends Aliasable {
   block: string;
 }
 
-type ObsidianLink =
+export type ObsidianLink =
   | PageOnly
   | PageAndHeader
   | PageAndBlock

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { toSlug } from "./toSlug";
+import { toSlug } from "./utility.js";
 
 test("toSlug", () => {
   const actualOf = (fileName: string) => toSlug(fileName);
