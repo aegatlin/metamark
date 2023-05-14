@@ -1,8 +1,31 @@
 # Metamark
 
-A markdown manipulation utility.
+A markdown utility. One primary use case is processing Obsidian vaults.
 
 ## Usage
+
+### Obsidian
+
+You have an Obsidian vault. You want to share some or all of the content. Other
+means of doing so (like Obsidian Publish and manual file sharing) are
+undesirable for some reason (like you want to include the content within a
+pre-existing website). This is a good usage story for trying metamark.
+
+Metmark.obsidian is a namespace with various utilities, but the primary function
+is `vault.process`. (The `metamark.utility` functions are _very_ trivial
+convenience functions you could write on your own if you want.)
+
+```ts
+const vaultData = metamark.obsidian.vault.process("../path/to/vault/");
+const jsonString = metamark.utility.toJsonString(vaultData);
+metamark.utility.writeToFileSync("./content.json", jsonString);
+```
+
+#### How it works
+
+Vault markdowns are similar to regular markdown files except for wiki links (`[[Wiki Link]]`). Those links resolve to a file path within your vault (`vaultDir/wiki-link`). When you turn them into html, they need to resolve to a url path (`/content/wiki-link`). This library helps you manage that.
+
+### Old (Delete when covered)
 
 An example use case for metamark is transforming notes from an Obsidian vault into a JSON blob that is then saved to a personal website repo and used as the data source for content. The key function for this use case is `Metamark.getMarks`, which takes a list of `filePaths` (the notes in the Obsidian vault), and a `pageAllowSet` (the notes you make public).
 
@@ -13,32 +36,32 @@ Note that this build process takes place within the consuming repo, e.g., the pe
 ```js
 #! /usr/bin/env node
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs'
-import { Metamark } from 'metamark'
-import path from 'path'
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+import { Metamark } from "metamark";
+import path from "path";
 
-const dirPath = '../vault'
-const dirEntries = readdirSync(dirPath, { withFileTypes: true })
+const dirPath = "../vault";
+const dirEntries = readdirSync(dirPath, { withFileTypes: true });
 
-const pageAllowSet = new Set()
-const filePaths = []
+const pageAllowSet = new Set();
+const filePaths = [];
 
 dirEntries.forEach((dirEntry) => {
   if (dirEntry.isFile()) {
-    const filePath = path.join(dirPath, dirEntry.name)
-    const { name: page } = path.parse(filePath)
-    const rawMd = readFileSync(filePath, 'utf8')
-    const frontmatter = Metamark.getFrontmatter(rawMd)
+    const filePath = path.join(dirPath, dirEntry.name);
+    const { name: page } = path.parse(filePath);
+    const rawMd = readFileSync(filePath, "utf8");
+    const frontmatter = Metamark.getFrontmatter(rawMd);
     if (frontmatter?.public) {
-      pageAllowSet.add(page)
-      filePaths.push(filePath)
+      pageAllowSet.add(page);
+      filePaths.push(filePath);
     }
   }
-})
+});
 
-const marks = Metamark.getMarks(filePaths, pageAllowSet)
-const jsonContents = JSON.stringify(marks, null, 2)
-writeFileSync('./contents.json', jsonContents)
+const marks = Metamark.getMarks(filePaths, pageAllowSet);
+const jsonContents = JSON.stringify(marks, null, 2);
+writeFileSync("./contents.json", jsonContents);
 ```
 
 ## API
@@ -55,7 +78,8 @@ type: `(rawMd: string) => { [key: string]: any }`
 
 type: `(filePathList: string[], pageAllowSet: Set<string>, options?: GetMarksOptions) => Mark[]`
 
-where 
+where
+
 ```
 export type GetPageUri = (page: string, toSlug: (s: string) => string) => {uri: string, slug: string};
 export type GetPageUriBuilder = (x: {frontmatter: { [key: string]: any }}) => GetPageUri
@@ -68,6 +92,7 @@ export interface  GetMarksOptions {
 Creates an array of `Mark` objects (defined in `lib/index.ts`). Each `Mark` contains data related to individual files like `slug`, `toc` (table of contents), `html`, etc. An individual `Mark` can be fetched via `Metamark.getMark`.
 
 #### option 'getPageUriBuilder'
+
 By default, when you create a link to another page in Obsidian, the link will use the following pattern: `/content/{page slug}`. However, you can customize this pattern using the `getPageUriBuilder` function.
 
 To customize the link, you'll need to provide a function to the `getPageUriBuilder` option. This function takes the page's frontmatter as its argument and returns another function that takes two arguments: page (the page slug) and toSlug (a function that converts a string to a slug).
@@ -95,36 +120,4 @@ This function returns a JSON array based on the headers within the `html` file. 
 
 This API is useful if you want to use the toc data to create your own ToC experience. You can build your own user experience around it.
 
-___
-
-# v0.9 stuff
-
-## Usage
-
-```ts
-import { metamark as m, Md, Mark } from "metamark";
-
-// const md: Md = m.file.getMd.fromFilePath("./path/to/File.md");
-const md: Md = m.file.getMd.fromContent("# Hello");
-
-m.file.getFileName(md);
-m.unified.getFirstParagraphText(md);
-
-const mark: Mark = m.mark.getMark(md);
-```
-
-## Obsidian use case
-
-```js
-#! /usr/bin/env node
-
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { metamark as m } from "metamark";
-import path from "path";
-
-const { filePaths, pageAllowSet } = m.dir.process("../vault");
-const marks = m.mark.getMarks(filePaths, pageAllowSet);
-
-const jsonContents = JSON.stringify(marks, null, 2);
-writeFileSync("./contents.json", jsonContents);
-```
+---

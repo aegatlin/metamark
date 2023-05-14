@@ -1,20 +1,38 @@
 import { Link, ToLink, WikiLink } from "remark-obsidian-link";
-import { Preset } from "unified";
-import { Metamark } from "./types";
-import { toSlug } from "./utility";
+import { getFileName, toSlug } from "./utility";
 
-export function isPreset(config: Metamark.Unified.Options): config is Preset {
-  return !!config?.plugins || !!config?.settings;
-}
+export const toLinkBuilder: (filePathAllowSet: Set<string>) => ToLink =
+  (filePathAllowSet) => (wikiLink) => {
+    const obsidianLink = wikiToObsidian(wikiLink);
 
-export const toLink: ToLink = (wikiLink: WikiLink): Link => {
-  const obsidianLink = wikiToObsidian(wikiLink);
+    switch (obsidianLink.type) {
+      case "page":
+      case "page-header":
+      case "page-block": {
+        const pageNameAllowSet = new Set(
+          Array.from(filePathAllowSet).map((filePath) => getFileName(filePath))
+        );
 
+        return pageNameAllowSet.has(obsidianLink.page)
+          ? obsidianLinkToMdastLink(obsidianLink)
+          : toMdastValue(obsidianLink);
+      }
+      case "header":
+        return obsidianLinkToMdastLink(obsidianLink);
+      case "block":
+        return toMdastValue(obsidianLink);
+      default:
+        const _exhaustiveCheck: never = obsidianLink;
+        return obsidianLink;
+    }
+  };
+
+function obsidianLinkToMdastLink(obsidianLink: ObsidianLink): Link {
   return {
     value: toMdastValue(obsidianLink),
     uri: toMdastUri(obsidianLink),
   };
-};
+}
 
 function toMdastUri(ol: ObsidianLink): string {
   switch (ol.type) {
@@ -40,7 +58,7 @@ function toMdastValue(ol: ObsidianLink): string {
     case "page-header":
       return `${ol.page}#${ol.header}`;
     case "page-block":
-      return `${ol.page}#^${ol.block}`;
+      return `${ol.page}`;
     case "header":
       return `#${ol.header}`;
     case "block":

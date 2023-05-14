@@ -1,8 +1,14 @@
 import { Link, WikiLink } from "remark-obsidian-link";
 import { expect, test } from "vitest";
-import { ObsidianLink, toLink, wikiToObsidian } from "./unified.utility";
+import {
+  ObsidianLink,
+  toLinkBuilder,
+  wikiToObsidian,
+} from "./obsidian.vault.toLinkBuilder";
 
-test("toLink", () => {
+test("toLinkBuilder", () => {
+  const toLink = toLinkBuilder(new Set(["/Wiki Link.md"]));
+
   for (const l of links) {
     expect(toLink(l.wikiLink)).toEqual(l.mdastLink);
   }
@@ -14,11 +20,13 @@ test("wikiToObsidian", () => {
   }
 });
 
+// Wiki Link is _in_ the allowSet
+// Unallowed Link is _not_ in the allowSet
 const links: {
   wikiText: string;
   wikiLink: WikiLink;
   obsidianLink: ObsidianLink;
-  mdastLink: Link;
+  mdastLink: Link | string;
 }[] = [
   {
     wikiText: "[[Wiki Link]]",
@@ -44,6 +52,25 @@ const links: {
       value: "Alias",
       uri: "/content/wiki-link",
     },
+  },
+  {
+    wikiText: "[[Unallowed Link]]",
+    wikiLink: { value: "Unallowed Link" },
+    obsidianLink: {
+      type: "page",
+      page: "Unallowed Link",
+    },
+    mdastLink: "Unallowed Link",
+  },
+  {
+    wikiText: "[[Unallowed Link | Alias]]",
+    wikiLink: { value: "Unallowed Link", alias: "Alias" },
+    obsidianLink: {
+      type: "page",
+      page: "Unallowed Link",
+      alias: "Alias",
+    },
+    mdastLink: "Alias",
   },
   {
     wikiText: "[[Wiki Link#Header]]",
@@ -73,6 +100,27 @@ const links: {
     },
   },
   {
+    wikiText: "[[Unallowed Link#Header]]",
+    wikiLink: { value: "Unallowed Link#Header" },
+    obsidianLink: {
+      type: "page-header",
+      page: "Unallowed Link",
+      header: "Header",
+    },
+    mdastLink: "Unallowed Link#Header",
+  },
+  {
+    wikiText: "[[Unallowed Link#Header | Alias]]",
+    wikiLink: { value: "Unallowed Link#Header", alias: "Alias" },
+    obsidianLink: {
+      type: "page-header",
+      page: "Unallowed Link",
+      header: "Header",
+      alias: "Alias",
+    },
+    mdastLink: "Alias",
+  },
+  {
     wikiText: "[[Wiki Link#^block]]",
     wikiLink: { value: "Wiki Link#^block" },
     obsidianLink: {
@@ -81,7 +129,7 @@ const links: {
       block: "block",
     },
     mdastLink: {
-      value: "Wiki Link#^block",
+      value: "Wiki Link",
       uri: "/content/wiki-link",
     },
   },
@@ -98,6 +146,27 @@ const links: {
       value: "Alias",
       uri: "/content/wiki-link",
     },
+  },
+  {
+    wikiText: "[[Unallowed Link#^block]]",
+    wikiLink: { value: "Unallowed Link#^block" },
+    obsidianLink: {
+      type: "page-block",
+      page: "Unallowed Link",
+      block: "block",
+    },
+    mdastLink: "Unallowed Link",
+  },
+  {
+    wikiText: "[[Unallowed Link#^block | Alias ]]",
+    wikiLink: { value: "Unallowed Link#^block", alias: "Alias" },
+    obsidianLink: {
+      type: "page-block",
+      page: "Unallowed Link",
+      block: "block",
+      alias: "Alias",
+    },
+    mdastLink: "Alias",
   },
   {
     wikiText: "[[#Header Link]]",
@@ -131,10 +200,7 @@ const links: {
       type: "block",
       block: "block",
     },
-    mdastLink: {
-      value: "#^block",
-      uri: "",
-    },
+    mdastLink: "#^block",
   },
   {
     wikiText: "[[#^block | Alias]]",
@@ -144,9 +210,7 @@ const links: {
       block: "block",
       alias: "Alias",
     },
-    mdastLink: {
-      value: "Alias",
-      uri: "",
-    },
+    mdastLink: "Alias",
   },
+  // The following are _not_ in the page allow set
 ];
