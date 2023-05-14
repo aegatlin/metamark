@@ -1,7 +1,7 @@
 {
   "name": "metamark",
   "type": "module",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "repository": "aegatlin/metamark",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
