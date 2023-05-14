@@ -130,84 +130,19 @@ var require_extend = __commonJS({
   }
 });
 
-// lib/index.ts
-var lib_exports = {};
-__export(lib_exports, {
-  metamark: () => metamark
+// src/index.ts
+var src_exports = {};
+__export(src_exports, {
+  default: () => src_default
 });
-module.exports = __toCommonJS(lib_exports);
+module.exports = __toCommonJS(src_exports);
 
-// lib/file/index.ts
-var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
-var import_gray_matter = __toESM(require("gray-matter"), 1);
-
-// lib/nod.ts
-var import_node_fs = __toESM(require("fs"), 1);
-var import_node_path = __toESM(require("path"), 1);
-var import_node_process = __toESM(require("process"), 1);
-var nod = {
-  fs: import_node_fs.default,
-  path: import_node_path.default,
-  process: import_node_process.default
-};
-
-// lib/file/index.ts
-var file = {
-  getRaw: {
-    fromFilePath(filePath, n = nod) {
-      return n.fs.readFileSync(filePath, "utf8");
-    }
-  },
-  getMd: {
-    fromRaw(raw) {
-      const { content: md } = (0, import_gray_matter.default)(raw);
-      return md;
-    },
-    fromFilePath(filePath) {
-      const content = file.getRaw.fromFilePath(filePath);
-      return file.getMd.fromRaw(content);
-    }
-  },
-  getFm: {
-    fromRaw(raw) {
-      const { data: fm } = (0, import_gray_matter.default)(raw);
-      return fm;
-    },
-    fromFilePath(filePath) {
-      const content = file.getRaw.fromFilePath(filePath);
-      return file.getFm.fromRaw(content);
-    }
-  },
-  getFileName(filePath, n = nod) {
-    const { name } = n.path.parse(filePath);
-    return name;
-  },
-  getSlug(s) {
-    return (0, import_slugify.default)(s, { decamelize: false });
-  }
-};
-
-// lib/obsidian/vault/index.ts
-var vault = {
-  inspect(dirPath, shouldAdd = defaultShouldAdd, n = nod) {
-    const dirEntries = n.fs.readdirSync(dirPath, { withFileTypes: true });
-    const pageAllowSet = /* @__PURE__ */ new Set();
-    const filePaths = [];
-    dirEntries.forEach((dirEntry) => {
-      if (dirEntry.isFile()) {
-        const filePath = n.path.join(dirPath, dirEntry.name);
-        const page = file.getFileName(filePath);
-        const frontmatter = file.getFm.fromFilePath(filePath);
-        if (shouldAdd({ frontmatter })) {
-          pageAllowSet.add(page);
-          filePaths.push(filePath);
-        }
-      }
-    });
-    return { filePaths, pageAllowSet };
-  }
-};
-var defaultShouldAdd = ({ frontmatter }) => !!(frontmatter == null ? void 0 : frontmatter.public);
+// src/obsidian.vault.process.ts
+var import_slugify2 = __toESM(require("@sindresorhus/slugify"), 1);
+var import_gray_matter2 = __toESM(require("gray-matter"), 1);
+var import_hast_util_from_html = require("hast-util-from-html");
+var import_hast_util_heading = require("hast-util-heading");
+var import_hast_util_to_text = require("hast-util-to-text");
 
 // node_modules/highlight.js/es/languages/elixir.js
 function elixir(hljs) {
@@ -481,44 +416,20 @@ function elixir(hljs) {
   };
 }
 
-// lib/unified/presetBuilder.ts
+// src/obsidian.vault.process.ts
+var import_mdast_util_to_string = require("mdast-util-to-string");
+var import_node_fs2 = __toESM(require("fs"), 1);
+var import_node_path2 = __toESM(require("path"), 1);
 var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
+var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
 var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
 var import_rehype_slug = __toESM(require("rehype-slug"), 1);
 var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
+var import_remark_callouts = __toESM(require("remark-callouts"), 1);
 var import_remark_gfm = __toESM(require("remark-gfm"), 1);
 var import_remark_obsidian_link = require("remark-obsidian-link");
 var import_remark_parse = __toESM(require("remark-parse"), 1);
 var import_remark_rehype = __toESM(require("remark-rehype"), 1);
-var import_remark_callouts = __toESM(require("remark-callouts"), 1);
-var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
-var presetBuilder = ({ wikiLinkToMdastLink }) => {
-  return {
-    plugins: [
-      import_remark_parse.default,
-      import_remark_callouts.default,
-      import_remark_gfm.default,
-      [import_remark_obsidian_link.remarkObsidianLink, { toLink: wikiLinkToMdastLink }],
-      import_remark_rehype.default,
-      [import_rehype_external_links.default, { rel: ["nofollow"], target: "_blank" }],
-      import_rehype_slug.default,
-      [import_rehype_autolink_headings.default, { behavior: "wrap" }],
-      [import_rehype_highlight.default, { languages: { elixir } }],
-      import_rehype_stringify.default
-    ]
-  };
-};
-
-// lib/obsidian/index.ts
-var obsidian = {
-  vault
-};
-
-// lib/unified/index.ts
-var import_mdast_util_to_string = require("mdast-util-to-string");
-var import_remark_gfm2 = __toESM(require("remark-gfm"), 1);
-var import_remark_obsidian_link2 = require("remark-obsidian-link");
-var import_remark_parse2 = __toESM(require("remark-parse"), 1);
 
 // node_modules/bail/index.js
 function bail(error) {
@@ -807,13 +718,13 @@ var VFile = class {
    * be turned into a path with `url.fileURLToPath`.
    * @param {string|URL} path
    */
-  set path(path2) {
-    if (isUrl(path2)) {
-      path2 = (0, import_url.fileURLToPath)(path2);
+  set path(path3) {
+    if (isUrl(path3)) {
+      path3 = (0, import_url.fileURLToPath)(path3);
     }
-    assertNonEmpty(path2, "path");
-    if (this.path !== path2) {
-      this.history.push(path2);
+    assertNonEmpty(path3, "path");
+    if (this.path !== path3) {
+      this.history.push(path3);
     }
   }
   /**
@@ -976,8 +887,8 @@ function assertNonEmpty(part, name) {
     throw new Error("`" + name + "` cannot be empty");
   }
 }
-function assertPath(path2, name) {
-  if (!path2) {
+function assertPath(path3, name) {
+  if (!path3) {
     throw new Error("Setting `" + name + "` requires `path` to be set too");
   }
 }
@@ -1001,7 +912,7 @@ function base() {
   processor.stringify = stringify;
   processor.run = run;
   processor.runSync = runSync;
-  processor.process = process2;
+  processor.process = process;
   processor.processSync = processSync;
   return processor;
   function processor() {
@@ -1122,24 +1033,24 @@ function base() {
   }
   function parse(doc) {
     processor.freeze();
-    const file2 = vfile(doc);
+    const file = vfile(doc);
     const Parser = processor.Parser;
     assertParser("parse", Parser);
     if (newable(Parser, "parse")) {
-      return new Parser(String(file2), file2).parse();
+      return new Parser(String(file), file).parse();
     }
-    return Parser(String(file2), file2);
+    return Parser(String(file), file);
   }
   function stringify(node, doc) {
     processor.freeze();
-    const file2 = vfile(doc);
+    const file = vfile(doc);
     const Compiler = processor.Compiler;
     assertCompiler("stringify", Compiler);
     assertNode(node);
     if (newable(Compiler, "compile")) {
-      return new Compiler(node, file2).compile();
+      return new Compiler(node, file).compile();
     }
-    return Compiler(node, file2);
+    return Compiler(node, file);
   }
   function run(node, doc, callback) {
     assertNode(node);
@@ -1154,22 +1065,22 @@ function base() {
     executor(null, callback);
     function executor(resolve, reject) {
       transformers.run(node, vfile(doc), done);
-      function done(error, tree, file2) {
+      function done(error, tree, file) {
         tree = tree || node;
         if (error) {
           reject(error);
         } else if (resolve) {
           resolve(tree);
         } else {
-          callback(null, tree, file2);
+          callback(null, tree, file);
         }
       }
     }
   }
-  function runSync(node, file2) {
+  function runSync(node, file) {
     let result;
     let complete;
-    processor.run(node, file2, done);
+    processor.run(node, file, done);
     assertDone("runSync", "run", complete);
     return result;
     function done(error, tree) {
@@ -1178,7 +1089,7 @@ function base() {
       complete = true;
     }
   }
-  function process2(doc, callback) {
+  function process(doc, callback) {
     processor.freeze();
     assertParser("process", processor.Parser);
     assertCompiler("process", processor.Compiler);
@@ -1187,28 +1098,28 @@ function base() {
     }
     executor(null, callback);
     function executor(resolve, reject) {
-      const file2 = vfile(doc);
-      processor.run(processor.parse(file2), file2, (error, tree, file3) => {
-        if (error || !tree || !file3) {
+      const file = vfile(doc);
+      processor.run(processor.parse(file), file, (error, tree, file2) => {
+        if (error || !tree || !file2) {
           done(error);
         } else {
-          const result = processor.stringify(tree, file3);
+          const result = processor.stringify(tree, file2);
           if (result === void 0 || result === null) {
           } else if (looksLikeAVFileValue(result)) {
-            file3.value = result;
+            file2.value = result;
           } else {
-            file3.result = result;
+            file2.result = result;
           }
-          done(error, file3);
+          done(error, file2);
         }
       });
-      function done(error, file3) {
-        if (error || !file3) {
+      function done(error, file2) {
+        if (error || !file2) {
           reject(error);
         } else if (resolve) {
-          resolve(file3);
+          resolve(file2);
         } else {
-          callback(null, file3);
+          callback(null, file2);
         }
       }
     }
@@ -1218,10 +1129,10 @@ function base() {
     processor.freeze();
     assertParser("processSync", processor.Parser);
     assertCompiler("processSync", processor.Compiler);
-    const file2 = vfile(doc);
-    processor.process(file2, done);
+    const file = vfile(doc);
+    processor.process(file, done);
     assertDone("processSync", "process", complete);
-    return file2;
+    return file;
     function done(error) {
       complete = true;
       bail(error);
@@ -1287,91 +1198,247 @@ function looksLikeAVFileValue(value) {
   return typeof value === "string" || (0, import_is_buffer2.default)(value);
 }
 
-// lib/unified/getTocData.ts
-var import_hast_util_from_html = require("hast-util-from-html");
-var import_hast_util_heading = require("hast-util-heading");
-var import_hast_util_to_text = require("hast-util-to-text");
+// src/obsidian.vault.process.ts
 var import_unist_util_visit = require("unist-util-visit");
-function getTocData(html) {
-  const hast = (0, import_hast_util_from_html.fromHtml)(html);
-  const flatToc = [];
-  (0, import_unist_util_visit.visit)(hast, import_hast_util_heading.heading, (node) => {
-    var _a;
-    const tagName = node == null ? void 0 : node.tagName;
-    flatToc.push({
-      title: (0, import_hast_util_to_text.toText)(node),
-      depth: parseInt(tagName == null ? void 0 : tagName.at(1)) || -1,
-      id: (_a = node == null ? void 0 : node.properties) == null ? void 0 : _a.id
-    });
-  });
-  return flatToc;
+
+// src/utility.ts
+var utility_exports = {};
+__export(utility_exports, {
+  getFileName: () => getFileName,
+  getFrontmatterAndMd: () => getFrontmatterAndMd,
+  jsonStringify: () => jsonStringify,
+  toSlug: () => toSlug,
+  writeToFileSync: () => writeToFileSync
+});
+var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
+var import_gray_matter = __toESM(require("gray-matter"), 1);
+var import_node_fs = __toESM(require("fs"), 1);
+var import_node_path = __toESM(require("path"), 1);
+function toSlug(s) {
+  return (0, import_slugify.default)(s, { decamelize: false });
+}
+function getFileName(filePath) {
+  const { name } = import_node_path.default.parse(filePath);
+  return name;
+}
+function getFrontmatterAndMd(filePath) {
+  const raw = import_node_fs.default.readFileSync(filePath, "utf8");
+  const { content, data } = (0, import_gray_matter.default)(raw);
+  return {
+    md: content,
+    frontmatter: data
+  };
+}
+function jsonStringify(o) {
+  return JSON.stringify(o, null, 2);
+}
+function writeToFileSync(filePath, content) {
+  import_node_fs.default.writeFileSync(filePath, content, "utf8");
 }
 
-// lib/unified/index.ts
-var unified2 = {
-  getTocData,
-  getFirstParagraphText(md) {
-    const mdast = getMdastRoot(md);
-    const firstParagraph = mdast.children.find(
-      (child) => child.type === "paragraph"
-    );
-    return (0, import_mdast_util_to_string.toString)(firstParagraph);
-  },
-  getHtml(md, preset) {
-    return unified().use(preset).processSync(md).toString();
-  },
-  getText(md) {
-    const mdast = getMdastRoot(md);
-    return (0, import_mdast_util_to_string.toString)(mdast);
-  },
-  presetBuilder
-};
-function getMdastRoot(md) {
-  const mdast = unified().use(import_remark_parse2.default).use(import_remark_gfm2.default).use(import_remark_obsidian_link2.remarkObsidianLink).parse(md);
-  return mdast;
-}
-
-// lib/obsidian/mark/index.ts
-var mark = {
-  getMark(filePath, pageAllowSet, config, options) {
-    const fileName = file.getFileName(filePath);
-    const md = file.getMd.fromFilePath(filePath);
-    const fm = file.getFm.fromFilePath(filePath);
-    const html = unified2.getHtml(md, config.preset);
-    const mark2 = {
-      page: fileName,
-      slug: file.getSlug(fileName),
-      toc: unified2.getTocData(html),
-      firstParagraphText: unified2.getFirstParagraphText(md),
-      frontmatter: fm,
-      html,
-      text: unified2.getText(md)
-    };
-    return mark2;
-  },
-  getMarks(filePathList, pageAllowSet, config, options) {
-    const marks = [];
-    for (const filePath of filePathList) {
-      const page = file.getFileName(filePath);
-      if (pageAllowSet.has(page)) {
-        marks.push(mark.getMark(filePath, pageAllowSet, config));
-      }
+// src/obsidian.vault.toLinkBuilder.ts
+var toLinkBuilder = ({ filePathAllowSet, toSlug: toSlug2, prefix }) => (wikiLink) => {
+  const uriOpts = { toSlug: toSlug2, prefix };
+  const obsidianLink = wikiToObsidian(wikiLink);
+  switch (obsidianLink.type) {
+    case "page":
+    case "page-header":
+    case "page-block": {
+      const pageNameAllowSet = new Set(
+        Array.from(filePathAllowSet).map((filePath) => getFileName(filePath))
+      );
+      return pageNameAllowSet.has(obsidianLink.page) ? obsidianLinkToMdastLink(obsidianLink, uriOpts) : toMdastValue(obsidianLink);
     }
-    return marks;
+    case "header":
+      return obsidianLinkToMdastLink(obsidianLink, uriOpts);
+    case "block":
+      return toMdastValue(obsidianLink);
+    default:
+      const _exhaustiveCheck = obsidianLink;
+      return obsidianLink;
   }
 };
-
-// lib/index.ts
-var metamark = {
-  dir: obsidian,
-  file,
-  unified: unified2,
-  mark
+function obsidianLinkToMdastLink(obsidianLink, uriOpts) {
+  return {
+    value: toMdastValue(obsidianLink),
+    uri: toMdastUri(obsidianLink, uriOpts)
+  };
+}
+function toMdastUri(ol, { toSlug: toSlug2, prefix }) {
+  switch (ol.type) {
+    case "page":
+      return `${prefix}/${toSlug2(ol.page)}`;
+    case "page-header":
+      return `${prefix}/${toSlug2(ol.page)}#${toSlug2(ol.header)}`;
+    case "page-block":
+      return `${prefix}/${toSlug2(ol.page)}`;
+    case "header":
+      return `#${toSlug2(ol.header)}`;
+    case "block":
+      return "";
+  }
+}
+function toMdastValue(ol) {
+  if (ol?.alias)
+    return ol.alias;
+  switch (ol.type) {
+    case "page":
+      return `${ol.page}`;
+    case "page-header":
+      return `${ol.page}#${ol.header}`;
+    case "page-block":
+      return `${ol.page}`;
+    case "header":
+      return `#${ol.header}`;
+    case "block":
+      return `#^${ol.block}`;
+    default:
+      const _exhaustiveCheck = ol;
+      return ol;
+  }
+}
+function wikiToObsidian(wikiLink) {
+  const { value, alias } = wikiLink;
+  switch (true) {
+    case Regex.BlockOnly.test(value): {
+      let blockOnly = {
+        type: "block",
+        block: value.slice(2)
+      };
+      if (alias)
+        blockOnly.alias = alias;
+      return blockOnly;
+    }
+    case Regex.HeaderOnly.test(value): {
+      let headerOnly = {
+        type: "header",
+        header: value.slice(1)
+      };
+      if (alias)
+        headerOnly.alias = alias;
+      return headerOnly;
+    }
+    case Regex.PageAndBlock.test(value): {
+      const [page, block] = value.split("#^");
+      let pageAndBlock = {
+        type: "page-block",
+        page,
+        block
+      };
+      if (alias)
+        pageAndBlock.alias = alias;
+      return pageAndBlock;
+    }
+    case Regex.PageAndHeader.test(value): {
+      const [page, header] = value.split("#");
+      let pageAndHeader = {
+        type: "page-header",
+        page,
+        header
+      };
+      if (alias)
+        pageAndHeader.alias = alias;
+      return pageAndHeader;
+    }
+    default: {
+      let page = {
+        type: "page",
+        page: value
+      };
+      if (alias)
+        page.alias = alias;
+      return page;
+    }
+  }
+}
+var Regex = {
+  // test for alias
+  // Alias: /.+\|.+/,
+  // test for starting with a header, so "header only" the test is testing for
+  // NOT a block. I.e., anything not-block-like is a header
+  HeaderOnly: /^#[^\^]+/,
+  // test for starting with a header-block (e.g., #^block),
+  // so "block only"
+  BlockOnly: /^#\^.+/,
+  // test for normal link with a header (i.e., does not have a block)
+  PageAndHeader: /.+#[^\^]+/,
+  // test for normal link with a block (this excludes the header as an option)
+  PageAndBlock: /.+#\^.+/
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  metamark
-});
+
+// src/obsidian.vault.process.ts
+function obsidianVaultProcess(dirPath, opts) {
+  const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultBuildFilePathAllowSet(dirPath);
+  const toLink = toLinkBuilder(
+    opts?.toLinkBuilderOpts ?? {
+      filePathAllowSet,
+      toSlug: src_default.utility.toSlug,
+      prefix: "/content"
+    }
+  );
+  const processor = unifiedProcessorBuilder({ toLink });
+  const pages = [];
+  for (const filePath of filePathAllowSet) {
+    const { name: fileName } = import_node_path2.default.parse(filePath);
+    const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
+    const { content: md, data: frontmatter } = (0, import_gray_matter2.default)(raw);
+    const mdastRoot = processor.parse(md);
+    const htmlString = processor.processSync(md).toString();
+    const firstParagraph = mdastRoot.children.find(
+      (child) => child.type === "paragraph"
+    );
+    const firstParagraphText = (0, import_mdast_util_to_string.toString)(firstParagraph);
+    const hast = (0, import_hast_util_from_html.fromHtml)(htmlString);
+    const flatToc = [];
+    (0, import_unist_util_visit.visit)(hast, import_hast_util_heading.heading, (node) => {
+      const tagName = node?.tagName;
+      flatToc.push({
+        title: (0, import_hast_util_to_text.toText)(node),
+        depth: parseInt(tagName?.at(1)) || -1,
+        id: node?.properties?.id
+      });
+    });
+    const file = {
+      fileName,
+      slug: (0, import_slugify2.default)(fileName, { decamelize: false }),
+      frontmatter,
+      firstParagraphText,
+      html: htmlString,
+      toc: flatToc
+    };
+    pages.push(file);
+  }
+  return pages;
+}
+var unifiedProcessorBuilder = ({ toLink }) => {
+  return unified().use(import_remark_parse.default).use(import_remark_gfm.default).use(import_remark_obsidian_link.remarkObsidianLink, { toLink }).use(import_remark_callouts.default).use(import_remark_rehype.default).use(import_rehype_external_links.default).use(import_rehype_slug.default).use(import_rehype_autolink_headings.default, { behavior: "wrap" }).use(import_rehype_highlight.default, { languages: { elixir } }).use(import_rehype_stringify.default);
+};
+var defaultBuildFilePathAllowSet = (dirPath) => {
+  const dirEntries = import_node_fs2.default.readdirSync(dirPath, { withFileTypes: true });
+  const filePathAllowSet = /* @__PURE__ */ new Set();
+  dirEntries.forEach((dirEntry) => {
+    if (dirEntry.isFile()) {
+      const filePath = import_node_path2.default.join(dirPath, dirEntry.name);
+      const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
+      const { data: frontmatter } = (0, import_gray_matter2.default)(raw);
+      if (!!frontmatter?.public) {
+        filePathAllowSet.add(filePath);
+      }
+    }
+  });
+  return filePathAllowSet;
+};
+
+// src/index.ts
+var metamark = {
+  obsidian: {
+    vault: {
+      process: obsidianVaultProcess
+    }
+  },
+  utility: utility_exports
+};
+var src_default = metamark;
 /*! Bundled license information:
 
 is-buffer/index.js:

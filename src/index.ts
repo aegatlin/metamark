@@ -1,5 +1,5 @@
-import { obsidianVaultProcess } from "./obsidian.vault.process.js";
-import * as utility from "./utility.js";
+import { obsidianVaultProcess } from "./obsidian.vault.process";
+import * as utility from "./utility";
 
 const metamark = {
   obsidian: {

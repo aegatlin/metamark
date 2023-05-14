@@ -5,9 +5,14 @@ import {
   toLinkBuilder,
   wikiToObsidian,
 } from "./obsidian.vault.toLinkBuilder";
+import m from "../src/";
 
 test("toLinkBuilder", () => {
-  const toLink = toLinkBuilder(new Set(["/Wiki Link.md"]));
+  const toLink = toLinkBuilder({
+    filePathAllowSet: new Set(["/Wiki Link.md"]),
+    toSlug: m.utility.toSlug,
+    prefix: "/content",
+  });
 
   for (const l of links) {
     expect(toLink(l.wikiLink)).toEqual(l.mdastLink);

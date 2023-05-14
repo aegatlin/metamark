@@ -1,6 +1,6 @@
 import { Root as HastRoot } from "hast";
 import { Root as MdastRoot } from "mdast";
-import { Link, WikiLink as _WikiLink } from "remark-obsidian-link";
+import { Link, ToLink, WikiLink as _WikiLink } from "remark-obsidian-link";
 import { Processor } from "unified";
 
 export namespace Metamark {
@@ -9,11 +9,6 @@ export namespace Metamark {
 
   export namespace Obsidian {
     export namespace Vault {
-      export type BuildFilePathAllowSet = (dirPath: string) => Set<string>;
-
-      export type BuildUnifiedProcessor = (
-        filePathAllowSet: Set<string>
-      ) => Processor<MdastRoot, HastRoot, HastRoot, string>;
       export interface FileData {
         fileName: string;
         slug: string;
@@ -24,9 +19,24 @@ export namespace Metamark {
       }
 
       export interface ProcessOptions {
-        buildFilePathAllowSet?: BuildFilePathAllowSet;
-        buildUnifiedProcessor?: BuildUnifiedProcessor;
+        filePathAllowSetBuilder?: FilePathAllowSetBuilder;
+        unifiedProcessorBuilder?: UnifiedProcessorBuilder;
+        toLinkBuilderOpts?: ToLinkBuilderOpts;
       }
+
+      export type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
+
+      export type UnifiedProcessorBuilder = (_: {
+        toLink: ToLink;
+      }) => Processor<MdastRoot, HastRoot, HastRoot, string>;
+
+      export type ToLinkBuilderOpts = {
+        filePathAllowSet: Set<string>;
+        toSlug: (s: string) => string;
+        prefix: string;
+      };
+
+      export type ToLinkBuilder = (_: ToLinkBuilderOpts) => ToLink;
     }
   }
 
