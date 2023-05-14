@@ -18,6 +18,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@flowershow/remark-wiki-link": "^1.1.2",
     "@sindresorhus/slugify": "^2.2.0",
     "@types/mdast": "^3.0.10",
     "gray-matter": "^4.0.3",
@@ -35,6 +36,7 @@
     "remark-obsidian-link": "^0.3.0",
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
+    "remark-wiki-link": "^1.0.4",
     "underscore": "^1.13.6",
     "unist-util-visit": "^4.1.1"
   },
