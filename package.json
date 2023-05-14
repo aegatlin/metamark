@@ -12,9 +12,9 @@
   },
   "scripts": {
     "ppp": "npm version patch && git push && npm publish",
-    "build": "tsup lib/index.ts --dts --format esm,cjs",
+    "build": "tsup src/index.ts --dts --format esm,cjs",
     "dev": "npm run build -- --watch",
-    "format": "prettier --write lib",
+    "format": "prettier --write src",
     "test": "vitest --run"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
     "unist-util-visit": "^4.1.1"
   },
   "devDependencies": {
+    "@tsconfig/node-lts": "^18.12.2",
     "@types/hast": "^2.3.4",
     "@types/node": "^18.7.23",
     "@types/underscore": "^1.11.4",

@@ -21,6 +21,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
+import m from "./";
 import { toLinkBuilder } from "./obsidian.vault.toLinkBuilder";
 import { Metamark } from "./types";
 
@@ -30,12 +31,18 @@ export function obsidianVaultProcess(
 ): Metamark.Obsidian.Vault.FileData[] {
   // handle options
   const filePathAllowSet =
-    opts?.buildFilePathAllowSet?.(dirPath) ??
+    opts?.filePathAllowSetBuilder?.(dirPath) ??
     defaultBuildFilePathAllowSet(dirPath);
 
-  const processor =
-    opts?.buildUnifiedProcessor?.(filePathAllowSet) ??
-    defaultBuildUnifiedProcessor(filePathAllowSet);
+  const toLink = toLinkBuilder(
+    opts?.toLinkBuilderOpts ?? {
+      filePathAllowSet,
+      toSlug: m.utility.toSlug,
+      prefix: "/content",
+    }
+  );
+
+  const processor = unifiedProcessorBuilder({ toLink });
 
   // collect pages
   const pages: Metamark.Obsidian.Vault.FileData[] = [];
@@ -84,24 +91,26 @@ export function obsidianVaultProcess(
   return pages;
 }
 
-const defaultBuildUnifiedProcessor: Metamark.Obsidian.Vault.BuildUnifiedProcessor =
-  (filePathAllowSet) => {
-    const toLink = toLinkBuilder(filePathAllowSet);
-
-    return unified()
-      .use(remarkParse)
-      .use(remarkGfm)
-      .use(remarkObsidianLink, { toLink })
-      .use(remarkCallouts)
-      .use(remarkRehype)
-      .use(rehypeExternalLinks)
-      .use(rehypeSlug)
-      .use(rehypeAutolinkHeadings, { behavior: "wrap" })
-      .use(rehypeHighlight, { languages: { elixir } })
-      .use(rehypeStringify);
+const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
+  ({ toLink }) => {
+    return (
+      unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkObsidianLink, { toLink })
+        // TODO: This can be fixed with remark-obsidian-link, probably
+        //@ts-ignore
+        .use(remarkCallouts)
+        .use(remarkRehype)
+        .use(rehypeExternalLinks)
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, { behavior: "wrap" })
+        .use(rehypeHighlight, { languages: { elixir } })
+        .use(rehypeStringify)
+    );
   };
 
-const defaultBuildFilePathAllowSet: Metamark.Obsidian.Vault.BuildFilePathAllowSet =
+const defaultBuildFilePathAllowSet: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
   (dirPath) => {
     const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
 

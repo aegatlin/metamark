@@ -1,8 +1,11 @@
-import { Link, ToLink, WikiLink } from "remark-obsidian-link";
-import { getFileName, toSlug } from "./utility";
+import { Link, WikiLink } from "remark-obsidian-link";
+import { Metamark } from "./types";
+import { getFileName } from "./utility";
 
-export const toLinkBuilder: (filePathAllowSet: Set<string>) => ToLink =
-  (filePathAllowSet) => (wikiLink) => {
+export const toLinkBuilder: Metamark.Obsidian.Vault.ToLinkBuilder =
+  ({ filePathAllowSet, toSlug, prefix }) =>
+  (wikiLink) => {
+    const uriOpts = { toSlug, prefix };
     const obsidianLink = wikiToObsidian(wikiLink);
 
     switch (obsidianLink.type) {
@@ -14,11 +17,11 @@ export const toLinkBuilder: (filePathAllowSet: Set<string>) => ToLink =
         );
 
         return pageNameAllowSet.has(obsidianLink.page)
-          ? obsidianLinkToMdastLink(obsidianLink)
+          ? obsidianLinkToMdastLink(obsidianLink, uriOpts)
           : toMdastValue(obsidianLink);
       }
       case "header":
-        return obsidianLinkToMdastLink(obsidianLink);
+        return obsidianLinkToMdastLink(obsidianLink, uriOpts);
       case "block":
         return toMdastValue(obsidianLink);
       default:
@@ -27,21 +30,29 @@ export const toLinkBuilder: (filePathAllowSet: Set<string>) => ToLink =
     }
   };
 
-function obsidianLinkToMdastLink(obsidianLink: ObsidianLink): Link {
+type UriOpts = {
+  toSlug: (s: string) => string;
+  prefix: string;
+};
+
+function obsidianLinkToMdastLink(
+  obsidianLink: ObsidianLink,
+  uriOpts: UriOpts
+): Link {
   return {
     value: toMdastValue(obsidianLink),
-    uri: toMdastUri(obsidianLink),
+    uri: toMdastUri(obsidianLink, uriOpts),
   };
 }
 
-function toMdastUri(ol: ObsidianLink): string {
+function toMdastUri(ol: ObsidianLink, { toSlug, prefix }: UriOpts): string {
   switch (ol.type) {
     case "page":
-      return `/content/${toSlug(ol.page)}`;
+      return `${prefix}/${toSlug(ol.page)}`;
     case "page-header":
-      return `/content/${toSlug(ol.page)}#${toSlug(ol.header)}`;
+      return `${prefix}/${toSlug(ol.page)}#${toSlug(ol.header)}`;
     case "page-block":
-      return `/content/${toSlug(ol.page)}`;
+      return `${prefix}/${toSlug(ol.page)}`;
     case "header":
       return `#${toSlug(ol.header)}`;
     case "block":
