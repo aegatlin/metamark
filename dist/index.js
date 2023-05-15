@@ -467,7 +467,7 @@ var Regex = {
 
 // src/obsidian.vault.process.ts
 function obsidianVaultProcess(dirPath, opts) {
-  const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultBuildFilePathAllowSet(dirPath);
+  const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultFilePathAllowSetBuilder(dirPath);
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
@@ -512,7 +512,7 @@ function obsidianVaultProcess(dirPath, opts) {
 var unifiedProcessorBuilder = ({ toLink }) => {
   return unified().use(remarkParse).use(remarkGfm).use(remarkObsidianLink, { toLink }).use(remarkCallouts).use(remarkRehype).use(rehypeExternalLinks).use(rehypeSlug).use(rehypeAutolinkHeadings, { behavior: "wrap" }).use(rehypeHighlight, { languages: { elixir } }).use(rehypeStringify);
 };
-var defaultBuildFilePathAllowSet = (dirPath) => {
+var defaultFilePathAllowSetBuilder = (dirPath) => {
   const dirEntries = fs2.readdirSync(dirPath, { withFileTypes: true });
   const filePathAllowSet = /* @__PURE__ */ new Set();
   dirEntries.forEach((dirEntry) => {

@@ -32,7 +32,7 @@ export function obsidianVaultProcess(
   // handle options
   const filePathAllowSet =
     opts?.filePathAllowSetBuilder?.(dirPath) ??
-    defaultBuildFilePathAllowSet(dirPath);
+    defaultFilePathAllowSetBuilder(dirPath);
 
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
@@ -110,7 +110,7 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
     );
   };
 
-const defaultBuildFilePathAllowSet: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
+const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
   (dirPath) => {
     const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
 
