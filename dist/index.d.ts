@@ -77,4 +77,4 @@ declare const metamark: {
     utility: typeof utility;
 };
 
-export { metamark as default };
+export { Metamark, metamark as default };
