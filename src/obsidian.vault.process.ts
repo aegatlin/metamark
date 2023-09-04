@@ -12,7 +12,7 @@ import path from "node:path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
-import rehypeMathjax from "rehype-mathjax";
+import rehypeMathjaxChtml from "rehype-mathjax/chtml.js";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
@@ -109,7 +109,12 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
         .use(rehypeSlug)
         .use(rehypeAutolinkHeadings, { behavior: "wrap" })
         .use(rehypeHighlight, { languages: { elixir } })
-        .use(rehypeMathjax)
+        .use(rehypeMathjaxChtml, {
+          chtml: {
+            fontURL:
+              "https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2",
+          },
+        })
         .use(rehypeStringify)
     );
   };
