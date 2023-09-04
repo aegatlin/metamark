@@ -61,9 +61,9 @@ test("vault", () => {
 
   // test default math
   expect(html).toMatch(
-    /<span class="math math-inline"><mjx-container class="MathJax" jax="SVG">/
+    /<span class="math math-inline"><mjx-container class="MathJax" jax="CHTML">/
   );
   expect(html).toMatch(
-    /<div class="math math-display"><mjx-container class="MathJax" jax="SVG" display="true">/
+    /<div class="math math-display"><mjx-container class="MathJax" jax="CHTML" display="true">/
   );
 });
