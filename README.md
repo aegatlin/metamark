@@ -20,8 +20,8 @@ metamark.utility.writeToFileSync("./content.json", jsonString);
 
 ### The tricky bit: wiki links
 
-The "hard problem" of processing an Obsidian vault is wiki links (`[[Wiki
-Link]]`). Those links resolve to a file path within your vault
+The "hard problem" of processing an Obsidian vault is wiki links (`[[Wiki Link]]`).
+Those links resolve to a file path within your vault
 (`vaultDir/wiki-link`). When you turn them into html, they need to resolve to a
 url path (`/content/wiki-link`). This library helps you manage that.
 
@@ -34,3 +34,11 @@ This is a complicated issue, and controlling the behavior results in complicated
 options when you call `m.obsidian.vault.process(dirPath, opts)`. Please see
 [types.ts](./src/types.ts) jsdocs for `Metamark.Obsidian.Vault.ProcessOpts` to
 learn more.
+
+## Publishing
+
+`npm version patch` will bump the version in `package.json` and create a new git
+commit and git tag for that version. `git push` will push the commits to
+remote, but you need to also run `git push --tags` to push the new tags to
+remote. You can then create a release via the github UI for that tag.
+`npm publish` will then push those changes to npm.
