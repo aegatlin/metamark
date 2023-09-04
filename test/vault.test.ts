@@ -58,4 +58,12 @@ test("vault", () => {
   expect(html).toMatch(
     "<strong><p>this is a callout section of type info without a header</p></strong>"
   );
+
+  // test default math
+  expect(html).toMatch(
+    /<span class="math math-inline"><mjx-container class="MathJax" jax="SVG">/
+  );
+  expect(html).toMatch(
+    /<div class="math math-display"><mjx-container class="MathJax" jax="SVG" display="true">/
+  );
 });

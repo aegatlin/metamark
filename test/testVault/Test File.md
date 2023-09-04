@@ -28,3 +28,11 @@ d = 3
 > this is a callout section of type tip with a header
 
 > [!info] this is a callout section of type info without a header
+
+Inline math $y = mx + b$
+
+Multiline math like
+
+$$
+y = mx + b
+$$

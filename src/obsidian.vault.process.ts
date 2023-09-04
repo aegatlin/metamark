@@ -12,10 +12,12 @@ import path from "node:path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
+import rehypeMathjax from "rehype-mathjax";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import { remarkObsidianLink } from "remark-obsidian-link";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -101,15 +103,23 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
         // TODO: This can be fixed with remark-obsidian-link, probably
         //@ts-ignore
         .use(remarkCallouts)
+        .use(remarkMath)
         .use(remarkRehype)
         .use(rehypeExternalLinks)
         .use(rehypeSlug)
         .use(rehypeAutolinkHeadings, { behavior: "wrap" })
         .use(rehypeHighlight, { languages: { elixir } })
+        .use(rehypeMathjax)
         .use(rehypeStringify)
     );
   };
 
+/**
+ * This function is the default implementation of the "allow set" builder. It
+ * takes the dirpath and constructs from is a `Set<string>` that represents the
+ * "allow set", which is the set of files that are considered public, and viable
+ * to be linked to in other notes.
+ */
 const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
   (dirPath) => {
     const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });

@@ -290,10 +290,12 @@ import path2 from "path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
+import rehypeMathjax from "rehype-mathjax";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import { remarkObsidianLink } from "remark-obsidian-link";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -510,7 +512,7 @@ function obsidianVaultProcess(dirPath, opts) {
   return pages;
 }
 var unifiedProcessorBuilder = ({ toLink }) => {
-  return unified().use(remarkParse).use(remarkGfm).use(remarkObsidianLink, { toLink }).use(remarkCallouts).use(remarkRehype).use(rehypeExternalLinks).use(rehypeSlug).use(rehypeAutolinkHeadings, { behavior: "wrap" }).use(rehypeHighlight, { languages: { elixir } }).use(rehypeStringify);
+  return unified().use(remarkParse).use(remarkGfm).use(remarkObsidianLink, { toLink }).use(remarkCallouts).use(remarkMath).use(remarkRehype).use(rehypeExternalLinks).use(rehypeSlug).use(rehypeAutolinkHeadings, { behavior: "wrap" }).use(rehypeHighlight, { languages: { elixir } }).use(rehypeMathjax).use(rehypeStringify);
 };
 var defaultFilePathAllowSetBuilder = (dirPath) => {
   const dirEntries = fs2.readdirSync(dirPath, { withFileTypes: true });

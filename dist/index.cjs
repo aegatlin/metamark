@@ -320,10 +320,12 @@ var import_node_path2 = __toESM(require("path"), 1);
 var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
 var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
 var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
+var import_rehype_mathjax = __toESM(require("rehype-mathjax"), 1);
 var import_rehype_slug = __toESM(require("rehype-slug"), 1);
 var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
 var import_remark_callouts = __toESM(require("remark-callouts"), 1);
 var import_remark_gfm = __toESM(require("remark-gfm"), 1);
+var import_remark_math = __toESM(require("remark-math"), 1);
 var import_remark_obsidian_link = require("remark-obsidian-link");
 var import_remark_parse = __toESM(require("remark-parse"), 1);
 var import_remark_rehype = __toESM(require("remark-rehype"), 1);
@@ -540,7 +542,7 @@ function obsidianVaultProcess(dirPath, opts) {
   return pages;
 }
 var unifiedProcessorBuilder = ({ toLink }) => {
-  return (0, import_unified.unified)().use(import_remark_parse.default).use(import_remark_gfm.default).use(import_remark_obsidian_link.remarkObsidianLink, { toLink }).use(import_remark_callouts.default).use(import_remark_rehype.default).use(import_rehype_external_links.default).use(import_rehype_slug.default).use(import_rehype_autolink_headings.default, { behavior: "wrap" }).use(import_rehype_highlight.default, { languages: { elixir } }).use(import_rehype_stringify.default);
+  return (0, import_unified.unified)().use(import_remark_parse.default).use(import_remark_gfm.default).use(import_remark_obsidian_link.remarkObsidianLink, { toLink }).use(import_remark_callouts.default).use(import_remark_math.default).use(import_remark_rehype.default).use(import_rehype_external_links.default).use(import_rehype_slug.default).use(import_rehype_autolink_headings.default, { behavior: "wrap" }).use(import_rehype_highlight.default, { languages: { elixir } }).use(import_rehype_mathjax.default).use(import_rehype_stringify.default);
 };
 var defaultFilePathAllowSetBuilder = (dirPath) => {
   const dirEntries = import_node_fs2.default.readdirSync(dirPath, { withFileTypes: true });

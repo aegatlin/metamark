@@ -25,8 +25,14 @@ test("wikiToObsidian", () => {
   }
 });
 
-// Wiki Link is _in_ the allowSet
-// Unallowed Link is _not_ in the allowSet
+/**
+ * This is an array of objects that represent various transforms a wiki link
+ * will undergo during processing.
+ *
+ * If the text refers to "Wiki Link", then it is in the allowset in testing (see
+ * line 12).  If the text refers to "Unallowed Link", then it is not in the
+ * allowset in testing.
+ */
 const links: {
   wikiText: string;
   wikiLink: WikiLink;
