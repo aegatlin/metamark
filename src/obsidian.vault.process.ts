@@ -25,7 +25,7 @@ import { Metamark } from "./types";
 
 export function obsidianVaultProcess(
   dirPath: string,
-  opts?: Metamark.Obsidian.Vault.ProcessOptions
+  opts?: Metamark.Obsidian.Vault.ProcessOptions,
 ): Metamark.Obsidian.Vault.FileData[] {
   // handle options
   const filePathAllowSet =
@@ -37,7 +37,7 @@ export function obsidianVaultProcess(
       filePathAllowSet,
       toSlug: m.utility.toSlug,
       prefix: "/content",
-    }
+    },
   );
 
   const processor = unifiedProcessorBuilder({ toLink });
