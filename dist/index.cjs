@@ -410,8 +410,7 @@ function toMdastUri(ol, { toSlug: toSlug2, prefix }) {
   }
 }
 function toMdastValue(ol) {
-  if (ol?.alias)
-    return ol.alias;
+  if (ol?.alias) return ol.alias;
   switch (ol.type) {
     case "page":
       return `${ol.page}`;
@@ -436,8 +435,7 @@ function wikiToObsidian(wikiLink) {
         type: "block",
         block: value.slice(2)
       };
-      if (alias)
-        blockOnly.alias = alias;
+      if (alias) blockOnly.alias = alias;
       return blockOnly;
     }
     case Regex.HeaderOnly.test(value): {
@@ -445,8 +443,7 @@ function wikiToObsidian(wikiLink) {
         type: "header",
         header: value.slice(1)
       };
-      if (alias)
-        headerOnly.alias = alias;
+      if (alias) headerOnly.alias = alias;
       return headerOnly;
     }
     case Regex.PageAndBlock.test(value): {
@@ -456,8 +453,7 @@ function wikiToObsidian(wikiLink) {
         page,
         block
       };
-      if (alias)
-        pageAndBlock.alias = alias;
+      if (alias) pageAndBlock.alias = alias;
       return pageAndBlock;
     }
     case Regex.PageAndHeader.test(value): {
@@ -467,17 +463,17 @@ function wikiToObsidian(wikiLink) {
         page,
         header
       };
-      if (alias)
-        pageAndHeader.alias = alias;
+      if (alias) pageAndHeader.alias = alias;
       return pageAndHeader;
     }
+    // There _could_ be a test for page that could
+    // look for _not_ rest of tests
     default: {
       let page = {
         type: "page",
         page: value
       };
-      if (alias)
-        page.alias = alias;
+      if (alias) page.alias = alias;
       return page;
     }
   }
