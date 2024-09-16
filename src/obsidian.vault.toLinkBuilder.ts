@@ -1,6 +1,6 @@
 import { Link, WikiLink } from "remark-obsidian-link";
+import * as lib from "./lib";
 import { Metamark } from "./types";
-import { getFileName } from "./utility";
 
 export const toLinkBuilder: Metamark.Obsidian.Vault.ToLinkBuilder =
   ({ filePathAllowSet, toSlug, prefix }) =>
@@ -13,7 +13,9 @@ export const toLinkBuilder: Metamark.Obsidian.Vault.ToLinkBuilder =
       case "page-header":
       case "page-block": {
         const pageNameAllowSet = new Set(
-          Array.from(filePathAllowSet).map((filePath) => getFileName(filePath))
+          Array.from(filePathAllowSet).map((filePath) =>
+            lib.utility.getFileName(filePath)
+          )
         );
 
         return pageNameAllowSet.has(obsidianLink.page)

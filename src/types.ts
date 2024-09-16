@@ -74,7 +74,7 @@ export namespace Metamark {
 
       export type UnifiedProcessorBuilder = (_: {
         toLink: ToLink;
-      }) => Processor<MdastRoot, HastRoot, HastRoot, string>;
+      }) => Processor<MdastRoot, MdastRoot, HastRoot, HastRoot, string>;
 
       export type ToLinkBuilderOpts = {
         filePathAllowSet: Set<string>;

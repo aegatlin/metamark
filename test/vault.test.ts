@@ -60,10 +60,11 @@ test("vault", () => {
   );
 
   // test default math
+  //// these used to test for `math-inline` and `math-display` / I assume
+  //// `display="true"` will now cover the checks for whether or not they are
+  //// inline or block displayed
+  expect(html).toMatch(/<mjx-container class="MathJax" jax="CHTML">/);
   expect(html).toMatch(
-    /<span class="math math-inline"><mjx-container class="MathJax" jax="CHTML">/
-  );
-  expect(html).toMatch(
-    /<div class="math math-display"><mjx-container class="MathJax" jax="CHTML" display="true">/
+    /<mjx-container class="MathJax" jax="CHTML" display="true">/
   );
 });

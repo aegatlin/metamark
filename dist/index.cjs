@@ -34,12 +34,103 @@ __export(src_exports, {
 });
 module.exports = __toCommonJS(src_exports);
 
-// src/obsidian.vault.process.ts
-var import_slugify2 = __toESM(require("@sindresorhus/slugify"), 1);
-var import_gray_matter2 = __toESM(require("gray-matter"), 1);
+// src/lib/hast.ts
+var hast_exports = {};
+__export(hast_exports, {
+  getToc: () => getToc
+});
 var import_hast_util_from_html = require("hast-util-from-html");
 var import_hast_util_heading = require("hast-util-heading");
 var import_hast_util_to_text = require("hast-util-to-text");
+var import_unist_util_visit = require("unist-util-visit");
+function isHeading(node) {
+  return (0, import_hast_util_heading.heading)(node);
+}
+function getHeaderDepth(headerString) {
+  switch (headerString) {
+    case "h1":
+      return 1;
+    case "h2":
+      return 2;
+    case "h3":
+      return 3;
+    case "h4":
+      return 4;
+    case "h5":
+      return 5;
+    case "h6":
+      return 6;
+    case "hgroup":
+      return -1;
+    default:
+      return -1;
+  }
+}
+function getToc(htmlString) {
+  const hast = (0, import_hast_util_from_html.fromHtml)(htmlString);
+  const flatToc = [];
+  (0, import_unist_util_visit.visit)(hast, isHeading, (node) => {
+    if (!(0, import_hast_util_heading.heading)(node)) throw "something bad";
+    flatToc.push({
+      id: node.properties.id?.toString() ?? "",
+      title: (0, import_hast_util_to_text.toText)(node),
+      depth: getHeaderDepth(node.tagName)
+    });
+  });
+  return flatToc;
+}
+
+// src/lib/mdast.ts
+var mdast_exports = {};
+__export(mdast_exports, {
+  getFirstParagraphText: () => getFirstParagraphText
+});
+var import_mdast_util_to_string = require("mdast-util-to-string");
+function getFirstParagraphText(mdastRoot) {
+  const paragraph = mdastRoot.children.find(
+    (child) => child.type == "paragraph"
+  );
+  return paragraph ? (0, import_mdast_util_to_string.toString)(paragraph) : void 0;
+}
+
+// src/lib/utility.ts
+var utility_exports = {};
+__export(utility_exports, {
+  getFileName: () => getFileName,
+  getFrontmatterAndMd: () => getFrontmatterAndMd,
+  jsonStringify: () => jsonStringify,
+  toSlug: () => toSlug,
+  writeToFileSync: () => writeToFileSync
+});
+var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
+var import_gray_matter = __toESM(require("gray-matter"), 1);
+var import_node_fs = __toESM(require("fs"), 1);
+var import_node_path = __toESM(require("path"), 1);
+function toSlug(s) {
+  return (0, import_slugify.default)(s, { decamelize: false });
+}
+function getFileName(filePath) {
+  const { name } = import_node_path.default.parse(filePath);
+  return name;
+}
+function getFrontmatterAndMd(filePath) {
+  const raw = import_node_fs.default.readFileSync(filePath, "utf8");
+  const { content, data } = (0, import_gray_matter.default)(raw);
+  return {
+    md: content,
+    frontmatter: data
+  };
+}
+function jsonStringify(o) {
+  return JSON.stringify(o, null, 2);
+}
+function writeToFileSync(filePath, content) {
+  import_node_fs.default.writeFileSync(filePath, content, "utf8");
+}
+
+// src/obsidian.vault.process.ts
+var import_slugify2 = __toESM(require("@sindresorhus/slugify"), 1);
+var import_gray_matter2 = __toESM(require("gray-matter"), 1);
 
 // node_modules/highlight.js/es/languages/elixir.js
 function elixir(hljs) {
@@ -314,13 +405,12 @@ function elixir(hljs) {
 }
 
 // src/obsidian.vault.process.ts
-var import_mdast_util_to_string = require("mdast-util-to-string");
 var import_node_fs2 = __toESM(require("fs"), 1);
 var import_node_path2 = __toESM(require("path"), 1);
 var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
 var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
 var import_rehype_highlight = __toESM(require("rehype-highlight"), 1);
-var import_chtml = __toESM(require("rehype-mathjax/chtml.js"), 1);
+var import_chtml = __toESM(require("rehype-mathjax/chtml"), 1);
 var import_rehype_slug = __toESM(require("rehype-slug"), 1);
 var import_rehype_stringify = __toESM(require("rehype-stringify"), 1);
 var import_remark_callouts = __toESM(require("remark-callouts"), 1);
@@ -330,42 +420,6 @@ var import_remark_obsidian_link = require("remark-obsidian-link");
 var import_remark_parse = __toESM(require("remark-parse"), 1);
 var import_remark_rehype = __toESM(require("remark-rehype"), 1);
 var import_unified = require("unified");
-var import_unist_util_visit = require("unist-util-visit");
-
-// src/utility.ts
-var utility_exports = {};
-__export(utility_exports, {
-  getFileName: () => getFileName,
-  getFrontmatterAndMd: () => getFrontmatterAndMd,
-  jsonStringify: () => jsonStringify,
-  toSlug: () => toSlug,
-  writeToFileSync: () => writeToFileSync
-});
-var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
-var import_gray_matter = __toESM(require("gray-matter"), 1);
-var import_node_fs = __toESM(require("fs"), 1);
-var import_node_path = __toESM(require("path"), 1);
-function toSlug(s) {
-  return (0, import_slugify.default)(s, { decamelize: false });
-}
-function getFileName(filePath) {
-  const { name } = import_node_path.default.parse(filePath);
-  return name;
-}
-function getFrontmatterAndMd(filePath) {
-  const raw = import_node_fs.default.readFileSync(filePath, "utf8");
-  const { content, data } = (0, import_gray_matter.default)(raw);
-  return {
-    md: content,
-    frontmatter: data
-  };
-}
-function jsonStringify(o) {
-  return JSON.stringify(o, null, 2);
-}
-function writeToFileSync(filePath, content) {
-  import_node_fs.default.writeFileSync(filePath, content, "utf8");
-}
 
 // src/obsidian.vault.toLinkBuilder.ts
 var toLinkBuilder = ({ filePathAllowSet, toSlug: toSlug2, prefix }) => (wikiLink) => {
@@ -376,7 +430,9 @@ var toLinkBuilder = ({ filePathAllowSet, toSlug: toSlug2, prefix }) => (wikiLink
     case "page-header":
     case "page-block": {
       const pageNameAllowSet = new Set(
-        Array.from(filePathAllowSet).map((filePath) => getFileName(filePath))
+        Array.from(filePathAllowSet).map(
+          (filePath) => utility_exports.getFileName(filePath)
+        )
       );
       return pageNameAllowSet.has(obsidianLink.page) ? obsidianLinkToMdastLink(obsidianLink, uriOpts) : toMdastValue(obsidianLink);
     }
@@ -511,27 +567,13 @@ function obsidianVaultProcess(dirPath, opts) {
     const { content: md, data: frontmatter } = (0, import_gray_matter2.default)(raw);
     const mdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
-    const firstParagraph = mdastRoot.children.find(
-      (child) => child.type === "paragraph"
-    );
-    const firstParagraphText = (0, import_mdast_util_to_string.toString)(firstParagraph);
-    const hast = (0, import_hast_util_from_html.fromHtml)(htmlString);
-    const flatToc = [];
-    (0, import_unist_util_visit.visit)(hast, import_hast_util_heading.heading, (node) => {
-      const tagName = node?.tagName;
-      flatToc.push({
-        title: (0, import_hast_util_to_text.toText)(node),
-        depth: parseInt(tagName?.at(1)) || -1,
-        id: node?.properties?.id
-      });
-    });
     const file = {
       fileName,
       slug: (0, import_slugify2.default)(fileName, { decamelize: false }),
       frontmatter,
-      firstParagraphText,
+      firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
-      toc: flatToc
+      toc: hast_exports.getToc(htmlString)
     };
     pages.push(file);
   }
@@ -567,6 +609,8 @@ var metamark = {
       process: obsidianVaultProcess
     }
   },
-  utility: utility_exports
+  utility: {
+    ...utility_exports
+  }
 };
 var src_default = metamark;

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { getFileName, getFrontmatterAndMd, toSlug } from "./utility.js";
+import * as lib from '../lib'
 
 function setup() {
   const filePath = "./test/testVault/Test File.md";
@@ -7,7 +7,7 @@ function setup() {
 }
 
 test("toSlug", () => {
-  const actualOf = (fileName: string) => toSlug(fileName);
+  const actualOf = (fileName: string) => lib.utility.toSlug(fileName);
 
   expect(actualOf("Wiki Link")).toBe("wiki-link");
   expect(actualOf("JavaScript")).toBe("javascript");
@@ -17,7 +17,7 @@ test("toSlug", () => {
 });
 
 test("getFileName", () => {
-  const actualOf = (filePath: string) => getFileName(filePath);
+  const actualOf = (filePath: string) => lib.utility.getFileName(filePath);
 
   expect(actualOf("any.file")).toBe("any");
   expect(actualOf("/path/to/a/File Name.txt")).toBe("File Name");
@@ -27,7 +27,7 @@ test("getFileName", () => {
 test("getFrontmatterAndMarkdown", () => {
   const { filePath } = setup();
 
-  const { frontmatter, md } = getFrontmatterAndMd(filePath);
+  const { frontmatter, md } = lib.utility.getFrontmatterAndMd(filePath);
 
   expect(frontmatter).toStrictEqual({
     public: true,

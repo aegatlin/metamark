@@ -1,5 +1,6 @@
+import * as lib from "./lib";
 import { obsidianVaultProcess } from "./obsidian.vault.process";
-import * as utility from "./utility";
+
 export * from "./types";
 
 const metamark = {
@@ -8,7 +9,9 @@ const metamark = {
       process: obsidianVaultProcess,
     },
   },
-  utility,
+  utility: {
+    ...lib.utility,
+  },
 };
 
 export default metamark;

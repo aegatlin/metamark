@@ -4,12 +4,103 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// src/obsidian.vault.process.ts
-import slugify2 from "@sindresorhus/slugify";
-import matter2 from "gray-matter";
+// src/lib/hast.ts
+var hast_exports = {};
+__export(hast_exports, {
+  getToc: () => getToc
+});
 import { fromHtml } from "hast-util-from-html";
 import { heading } from "hast-util-heading";
 import { toText } from "hast-util-to-text";
+import { visit } from "unist-util-visit";
+function isHeading(node) {
+  return heading(node);
+}
+function getHeaderDepth(headerString) {
+  switch (headerString) {
+    case "h1":
+      return 1;
+    case "h2":
+      return 2;
+    case "h3":
+      return 3;
+    case "h4":
+      return 4;
+    case "h5":
+      return 5;
+    case "h6":
+      return 6;
+    case "hgroup":
+      return -1;
+    default:
+      return -1;
+  }
+}
+function getToc(htmlString) {
+  const hast = fromHtml(htmlString);
+  const flatToc = [];
+  visit(hast, isHeading, (node) => {
+    if (!heading(node)) throw "something bad";
+    flatToc.push({
+      id: node.properties.id?.toString() ?? "",
+      title: toText(node),
+      depth: getHeaderDepth(node.tagName)
+    });
+  });
+  return flatToc;
+}
+
+// src/lib/mdast.ts
+var mdast_exports = {};
+__export(mdast_exports, {
+  getFirstParagraphText: () => getFirstParagraphText
+});
+import { toString } from "mdast-util-to-string";
+function getFirstParagraphText(mdastRoot) {
+  const paragraph = mdastRoot.children.find(
+    (child) => child.type == "paragraph"
+  );
+  return paragraph ? toString(paragraph) : void 0;
+}
+
+// src/lib/utility.ts
+var utility_exports = {};
+__export(utility_exports, {
+  getFileName: () => getFileName,
+  getFrontmatterAndMd: () => getFrontmatterAndMd,
+  jsonStringify: () => jsonStringify,
+  toSlug: () => toSlug,
+  writeToFileSync: () => writeToFileSync
+});
+import slugify from "@sindresorhus/slugify";
+import matter from "gray-matter";
+import fs from "node:fs";
+import path from "node:path";
+function toSlug(s) {
+  return slugify(s, { decamelize: false });
+}
+function getFileName(filePath) {
+  const { name } = path.parse(filePath);
+  return name;
+}
+function getFrontmatterAndMd(filePath) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { content, data } = matter(raw);
+  return {
+    md: content,
+    frontmatter: data
+  };
+}
+function jsonStringify(o) {
+  return JSON.stringify(o, null, 2);
+}
+function writeToFileSync(filePath, content) {
+  fs.writeFileSync(filePath, content, "utf8");
+}
+
+// src/obsidian.vault.process.ts
+import slugify2 from "@sindresorhus/slugify";
+import matter2 from "gray-matter";
 
 // node_modules/highlight.js/es/languages/elixir.js
 function elixir(hljs) {
@@ -284,13 +375,12 @@ function elixir(hljs) {
 }
 
 // src/obsidian.vault.process.ts
-import { toString } from "mdast-util-to-string";
 import fs2 from "node:fs";
 import path2 from "node:path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
-import rehypeMathjaxChtml from "rehype-mathjax/chtml.js";
+import rehypeMathjaxChtml from "rehype-mathjax/chtml";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
@@ -300,42 +390,6 @@ import { remarkObsidianLink } from "remark-obsidian-link";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { visit } from "unist-util-visit";
-
-// src/utility.ts
-var utility_exports = {};
-__export(utility_exports, {
-  getFileName: () => getFileName,
-  getFrontmatterAndMd: () => getFrontmatterAndMd,
-  jsonStringify: () => jsonStringify,
-  toSlug: () => toSlug,
-  writeToFileSync: () => writeToFileSync
-});
-import slugify from "@sindresorhus/slugify";
-import matter from "gray-matter";
-import fs from "node:fs";
-import path from "node:path";
-function toSlug(s) {
-  return slugify(s, { decamelize: false });
-}
-function getFileName(filePath) {
-  const { name } = path.parse(filePath);
-  return name;
-}
-function getFrontmatterAndMd(filePath) {
-  const raw = fs.readFileSync(filePath, "utf8");
-  const { content, data } = matter(raw);
-  return {
-    md: content,
-    frontmatter: data
-  };
-}
-function jsonStringify(o) {
-  return JSON.stringify(o, null, 2);
-}
-function writeToFileSync(filePath, content) {
-  fs.writeFileSync(filePath, content, "utf8");
-}
 
 // src/obsidian.vault.toLinkBuilder.ts
 var toLinkBuilder = ({ filePathAllowSet, toSlug: toSlug2, prefix }) => (wikiLink) => {
@@ -346,7 +400,9 @@ var toLinkBuilder = ({ filePathAllowSet, toSlug: toSlug2, prefix }) => (wikiLink
     case "page-header":
     case "page-block": {
       const pageNameAllowSet = new Set(
-        Array.from(filePathAllowSet).map((filePath) => getFileName(filePath))
+        Array.from(filePathAllowSet).map(
+          (filePath) => utility_exports.getFileName(filePath)
+        )
       );
       return pageNameAllowSet.has(obsidianLink.page) ? obsidianLinkToMdastLink(obsidianLink, uriOpts) : toMdastValue(obsidianLink);
     }
@@ -481,27 +537,13 @@ function obsidianVaultProcess(dirPath, opts) {
     const { content: md, data: frontmatter } = matter2(raw);
     const mdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
-    const firstParagraph = mdastRoot.children.find(
-      (child) => child.type === "paragraph"
-    );
-    const firstParagraphText = toString(firstParagraph);
-    const hast = fromHtml(htmlString);
-    const flatToc = [];
-    visit(hast, heading, (node) => {
-      const tagName = node?.tagName;
-      flatToc.push({
-        title: toText(node),
-        depth: parseInt(tagName?.at(1)) || -1,
-        id: node?.properties?.id
-      });
-    });
     const file = {
       fileName,
       slug: slugify2(fileName, { decamelize: false }),
       frontmatter,
-      firstParagraphText,
+      firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
-      toc: flatToc
+      toc: hast_exports.getToc(htmlString)
     };
     pages.push(file);
   }
@@ -537,7 +579,9 @@ var metamark = {
       process: obsidianVaultProcess
     }
   },
-  utility: utility_exports
+  utility: {
+    ...utility_exports
+  }
 };
 var src_default = metamark;
 export {
