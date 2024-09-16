@@ -1,6 +1,7 @@
 import slugify from "@sindresorhus/slugify";
 import matter from "gray-matter";
 import elixir from "highlight.js/lib/languages/elixir";
+import { common as commonLanguagesRecord } from "lowlight";
 import { Root as MdastRoot } from "mdast";
 import fs from "node:fs";
 import path from "node:path";
@@ -24,7 +25,7 @@ import { Metamark } from "./types";
 
 export function obsidianVaultProcess(
   dirPath: string,
-  opts?: Metamark.Obsidian.Vault.ProcessOptions,
+  opts?: Metamark.Obsidian.Vault.ProcessOptions
 ): Metamark.Obsidian.Vault.FileData[] {
   // handle options
   const filePathAllowSet =
@@ -36,7 +37,7 @@ export function obsidianVaultProcess(
       filePathAllowSet,
       toSlug: m.utility.toSlug,
       prefix: "/content",
-    },
+    }
   );
 
   const processor = unifiedProcessorBuilder({ toLink });
@@ -69,24 +70,29 @@ export function obsidianVaultProcess(
 
 const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
   ({ toLink }) => {
-    return unified()
-      .use(remarkParse)
-      .use(remarkGfm)
-      .use(remarkObsidianLink, { toLink })
-      .use(remarkCallouts)
-      .use(remarkMath)
-      .use(remarkRehype)
-      .use(rehypeExternalLinks)
-      .use(rehypeSlug)
-      .use(rehypeAutolinkHeadings, { behavior: "wrap" })
-      .use(rehypeHighlight, { languages: { elixir } })
-      .use(rehypeMathjaxChtml, {
-        chtml: {
-          fontURL:
-            "https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2",
-        },
-      })
-      .use(rehypeStringify);
+    return (
+      unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkObsidianLink, { toLink })
+        .use(remarkCallouts)
+        .use(remarkMath)
+        .use(remarkRehype)
+        .use(rehypeExternalLinks)
+        .use(rehypeSlug)
+        .use(rehypeAutolinkHeadings, { behavior: "wrap" })
+        // 37 common languages https://github.com/wooorm/lowlight/blob/main/lib/common.js
+        .use(rehypeHighlight, {
+          languages: { ...commonLanguagesRecord, elixir },
+        })
+        .use(rehypeMathjaxChtml, {
+          chtml: {
+            fontURL:
+              "https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2",
+          },
+        })
+        .use(rehypeStringify)
+    );
   };
 
 /**
