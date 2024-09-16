@@ -2,7 +2,10 @@
   "name": "metamark",
   "type": "module",
   "version": "0.10.0",
-  "repository": "aegatlin/metamark",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aegatlin/metamark.git"
+  },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "exports": {
