@@ -14,8 +14,8 @@ export const toLinkBuilder: Metamark.Obsidian.Vault.ToLinkBuilder =
       case "page-block": {
         const pageNameAllowSet = new Set(
           Array.from(filePathAllowSet).map((filePath) =>
-            lib.utility.getFileName(filePath)
-          )
+            lib.utility.getFileName(filePath),
+          ),
         );
 
         return pageNameAllowSet.has(obsidianLink.page)
@@ -39,7 +39,7 @@ type UriOpts = {
 
 function obsidianLinkToMdastLink(
   obsidianLink: ObsidianLink,
-  uriOpts: UriOpts
+  uriOpts: UriOpts,
 ): Link {
   return {
     value: toMdastValue(obsidianLink),

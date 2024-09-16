@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import * as lib from '../lib'
+import * as lib from "../lib";
 
 function setup() {
   const filePath = "./test/testVault/Test File.md";
