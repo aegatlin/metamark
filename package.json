@@ -1,10 +1,10 @@
 {
-  "name": "metamark",
+  "name": "obsidian-parser",
   "type": "module",
   "version": "0.10.3",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aegatlin/metamark.git"
+    "url": "git+https://github.com/iplanwebsites/obsidian-parser.git"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -21,11 +21,16 @@
     "build": "tsup src/index.ts --dts --format esm,cjs",
     "dev": "npm run build -- --watch",
     "format": "prettier --write src",
-    "test": "vitest --run"
+    "test": "vitest --run",
+
+    "convert": "node command/cli.js",
+    "convert:example": "node command/cli.js -i ./example-vault -o output.json",
+    "convert:dev": "node command/cli.js --debug 2"
   },
   "dependencies": {
     "@portaljs/remark-wiki-link": "^1.2.0",
     "@sindresorhus/slugify": "^2.2.1",
+    "commander": "^13.1.0",
     "gray-matter": "^4.0.3",
     "hast-util-from-html": "^2.0.2",
     "hast-util-heading": "^3.0.0",

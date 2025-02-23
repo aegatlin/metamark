@@ -8,7 +8,21 @@ This is a form from metamark that aims to add features like:
 - image + ress parsing
 - more customization
 
-## Obsidian
+## CLI usage
+
+### Basic conversion with your own arguments
+
+npm run convert -- -i test/testVault -o test/cliTestOutput.json
+
+### Run the example configuration
+
+npm run convert:example
+
+### Run with extra debug information
+
+npm run convert:dev -- -i /path/to/vault
+
+# Obsidian
 
 A primary use case for metamark is processing Obsidian vaults.
 
