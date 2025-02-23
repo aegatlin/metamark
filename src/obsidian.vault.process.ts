@@ -60,6 +60,7 @@ export function obsidianVaultProcess(
       firstParagraphText: lib.mdast.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
       toc: lib.hast.getToc(htmlString),
+      originalFilePath: filePath, //TODO: make relative to vault root
     };
 
     pages.push(file);

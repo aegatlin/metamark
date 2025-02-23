@@ -15,6 +15,7 @@ declare namespace Metamark {
                 frontmatter: Record<string, any>;
                 html: string;
                 toc: TocItem[];
+                originalFilePath: string;
             }
             interface ProcessOptions {
                 /**
@@ -66,6 +67,8 @@ declare namespace Metamark {
                  * ```
                  */
                 toLinkBuilderOpts?: ToLinkBuilderOpts;
+                contentPathPrefix?: string;
+                imgPathPrefix?: string;
             }
             type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
             type UnifiedProcessorBuilder = (_: {

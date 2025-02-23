@@ -12951,7 +12951,8 @@ function obsidianVaultProcess(dirPath, opts) {
       frontmatter,
       firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
-      toc: hast_exports.getToc(htmlString)
+      toc: hast_exports.getToc(htmlString),
+      originalFilePath: filePath
     };
     pages.push(file);
   }
