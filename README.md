@@ -22,7 +22,8 @@ Obsidian Parser can:
 - [ ] Advanced image and resource parsing for assets's unnique wiki `![[filename]]` syntax
 - [ ] Configurable assets URL prefix (just dump your vault images and assets in a public folder or CDN)
 - [ ] Optional image resizing & pre-processing scripts, and corresponding src-set generation for different device resolution.
-- [ ] Link graph extraction (including backlinks for files and resources)
+- [ ] Backlink computation (enabled by extracting internal-links on all notes first)
+- [ ] Note graph extraction (including backlinks for files and resources)
 - [ ] Extended customization options for flexible workflow integration
 - [ ] Youtube embeds (just paste a youtube link)
 - [ ] Parametric config to enable/disable different modules, and pass options to processing module.
@@ -31,6 +32,7 @@ Obsidian Parser can:
   - [ ] Github actions examples
   - [ ] CLI usage examples
 - [ ] Sample front-end examples (react, express, vue)
+- [ ] Support for multi-level paths in output html (not just slugs). The origianl folder path remain available so you can still display hierarchy (a breadcrumb) easily in your front-end.
 
 ## CLI Usage
 
