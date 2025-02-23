@@ -8,11 +8,17 @@ A powerful markdown utility built on top of Metamark that enhances your Obsidian
 - [x] Comprehensive CLI utilities and npm scripts for easy automation
 - [x] Customizable link prefix to match your frontend routing requirements
 - [x] Provide original note path as prop
-- [ ] Advanced image and resource parsing for Obsidian's `![[filename]]` syntax
-- [ ] Configurable assets URL prefix supporting CDN hosting and image-resizing
-- [ ] Optional image pre-processing scripts for streamlined hosting
+- [x] Hide all private notes (set a `public: true` property to publish)
+- [x] automatic, Url-friendly, slug generation
+- [ ] Set custom slugs on notes (via `slug` property)
+- [ ] Advanced image and resource parsing for assets's unnique wiki `![[filename]]` syntax
+- [ ] Configurable assets URL prefix (just dump your vault images and assets in a public folder or CDN)
+- [ ] Optional image resizing & pre-processing scripts, and corresponding src-set generation for different device resolution.
 - [ ] Link graph extraction (including backlinks for files and resources)
 - [ ] Extended customization options for flexible workflow integration
+- [ ] Youtube embeds (just paste a youtube link)
+- [ ] Parametric config to enable/disable different modules, and pass options to processing module.
+- [ ] Good documentaiton
 
 ## CLI Usage
 
@@ -40,7 +46,21 @@ Run the conversion with additional debugging information:
 npm run convert:dev -- -i /path/to/vault
 ```
 
-## Metamark Documentation
+# Similar projects
+
+https://github.com/aegatlin/metamark/tree/main/test
+
+- original inspiration + source of this repo.
+
+https://github.com/flowershow/remark-wiki-link-plus
+
+- One of the few libs to parse wiki-style Assets, seems buggy with current version of Unified processor.
+
+https://github.com/flowershow/flowershow
+
+- All-in-one repo that takes an obsidian vault and publish it in a pre-made front-end.
+
+## Metamark Documentation (forked) ⬇️
 
 ### Overview
 
