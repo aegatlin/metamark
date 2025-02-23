@@ -1,71 +1,110 @@
-# Obsidian parser
+# Obsidian Parser
 
-A markdown utility.
+A powerful markdown utility built on top of Metamark that enhances your Obsidian vault processing capabilities.
 
-This is a form from metamark that aims to add extra features like:
+## Features
 
-[x] single-line conversion to JSON
-[x] includes CLI utilities and npm script.
-[x] custom link prefix to match your frontend routes
-[] image + ress parsing for obsidian ![[filename]] syntax
-[] custom assets url prefix (for CDN hosting or image-resizing)
-[] optional image-pre-processing scripts for easy hosting
-[] link graph extraction (backlinks of each-files + ressource)
-[] more customization options
+- [x] Single-line conversion to JSON for efficient data transformation
+- [x] Comprehensive CLI utilities and npm scripts for easy automation
+- [x] Customizable link prefix to match your frontend routing requirements
+- [ ] Advanced image and resource parsing for Obsidian's `![[filename]]` syntax
+- [ ] Configurable assets URL prefix supporting CDN hosting and image-resizing
+- [ ] Optional image pre-processing scripts for streamlined hosting
+- [ ] Link graph extraction (including backlinks for files and resources)
+- [ ] Extended customization options for flexible workflow integration
 
-## CLI usage
+## CLI Usage
 
-### Basic conversion with your own arguments
+### Basic Conversion with Custom Arguments
 
+Convert your Obsidian vault to JSON with specific input and output paths:
+
+```bash
 npm run convert -- -i test/testVault -o test/cliTestOutput.json
+```
 
-### Run the example configuration
+### Run the Example Configuration
 
+Execute the conversion using predefined example settings:
+
+```bash
 npm run convert:example
+```
 
-### Run with extra debug information
+### Debug Mode
 
+Run the conversion with additional debugging information:
+
+```bash
 npm run convert:dev -- -i /path/to/vault
+```
 
----
+## Metamark Documentation
 
-# metamatk doc:
+### Overview
 
-A primary use case for metamark is processing Obsidian vaults.
+Metamark serves as the foundation for processing Obsidian vaults, particularly useful when you want to share vault content through custom platforms rather than using solutions like Obsidian Publish.
 
-If you have an Obsidian vault, you want to share some or all of the content of
-that vault, and the popular methods of doing so (e.g., Obsidian Publish) are
-undesirable, then this might be a good reason to try metamark.
+### Basic Usage
 
-```ts
+Here's a simple example of processing an Obsidian vault:
+
+```typescript
 import metamark from "metamark";
 
+// Process the vault and generate structured data
 const vaultData = metamark.obsidian.vault.process("../path/to/vault/");
+
+// Convert the data to a JSON string
 const jsonString = metamark.utility.jsonStringify(vaultData);
+
+// Write the result to a file
 metamark.utility.writeToFileSync("./content.json", jsonString);
 ```
 
-### The tricky bit: wiki links
+### Understanding Wiki Links
 
-The "hard problem" of processing an Obsidian vault is wiki links (`[[Wiki Link]]`).
-Those links resolve to a file path within your vault
-(`vaultDir/wiki-link`). When you turn them into html, they need to resolve to a
-url path (`/content/wiki-link`). This library helps you manage that.
+The primary challenge in processing an Obsidian vault lies in handling wiki links (`[[Wiki Link]]`). These links need to be transformed from vault-relative paths (`vaultDir/wiki-link`) to URL-friendly paths (`/content/wiki-link`).
 
-There are a couple fundamental questions when processing a vault. (1) Which
-files are public and which are not? (2) How do you want to transform wiki links
-when a linked file is public/private? This includes both what is displayed and,
-if public, what the link URL is.
+When processing a vault, two fundamental considerations arise:
 
-This is a complicated issue, and controlling the behavior results in complicated
-options when you call `m.obsidian.vault.process(dirPath, opts)`. Please see
-[types.ts](./src/types.ts) jsdocs for `Metamark.Obsidian.Vault.ProcessOpts` to
-learn more.
+1. Content Access Control
 
-## Publishing
+   - Which files should be publicly accessible?
+   - What content should remain private?
 
-`npm version patch` will bump the version in `package.json` and create a new git
-commit and git tag for that version. `git push` will push the commits to
-remote, but you need to also run `git push --tags` to push the new tags to
-remote. You can then create a release via the github UI for that tag.
-`npm publish` will then push those changes to npm.
+2. Wiki Link Transformation
+   - How should links be displayed for public vs. private content?
+   - What URL structure should be used for public content?
+   - How should private content references be handled?
+
+For detailed configuration options, please refer to the `Metamark.Obsidian.Vault.ProcessOpts` documentation in [types.ts](./src/types.ts).
+
+## Publishing Guide
+
+To publish new versions of the package:
+
+1. Version Bump:
+
+   ```bash
+   npm version patch
+   ```
+
+   This command:
+
+   - Updates the version in `package.json`
+   - Creates a new git commit
+   - Adds a version tag
+
+2. Push Changes:
+
+   ```bash
+   git push
+   git push --tags
+   ```
+
+3. Release Process:
+   - Create a new release through the GitHub UI using the new tag
+   - Run `npm publish` to publish to the npm registry
+
+This process ensures proper version control and distribution of your package updates.
