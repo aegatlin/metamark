@@ -1,7 +1,11 @@
-import m from 'mdast-builder';
-import remarkWikiLink from 'remark-wiki-link';
+import { Plugin, Transformer } from 'unified';
+import { Node } from 'unist';
+import { Root } from 'mdast';
 import { SKIP, visit } from 'unist-util-visit';
+import m from 'mdast-builder';
+import wikiLinkPlugin from '@portaljs/remark-wiki-link';
 
+// Core interfaces that define our type structure
 interface WikiLink {
   value: string;
   alias?: string;
@@ -20,117 +24,127 @@ interface ObsidianLinkOptions {
   debug?: boolean;
 }
 
+// Extended Node type for wiki links
+interface WikiLinkNode extends Node {
+  type: 'wikiLink';
+  value: string;
+  data?: {
+    alias?: string;
+    permalink?: string;
+  };
+  alias?: string;
+}
+
+// Default configuration
 const defaultImageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
 
-export const myWikiParser = function (opts: ObsidianLinkOptions = {}) {
+// Create a debug logger
+const createLogger = (isEnabled: boolean) => ({
+  log: (message: string, data?: any) => {
+    if (isEnabled) {
+      console.log(`[Debug] ${message}`, data ? data : '');
+    }
+  },
+  error: (message: string, error?: any) => {
+    if (isEnabled) {
+      console.error(`[Error] ${message}`, error ? error : '');
+    }
+  }
+});
+
+// Helper to normalize node structure
+const normalizeNode = (node: WikiLinkNode): WikiLinkNode => {
+  if (!node.data) {
+    node.data = {};
+  }
+  if (!node.data.alias && node.alias) {
+    node.data.alias = node.alias;
+  }
+  return node;
+};
+
+// Main plugin function with proper unified Plugin typing
+export const remarkWikiParser: Plugin<[ObsidianLinkOptions?], Root> = function(opts: ObsidianLinkOptions = {}) {
+  // Initialize configuration
   const toLink = opts.toLink || (({ value, alias }) => alias || value);
   const toImage = opts.toImage || toLink;
   const imageExtensions = opts.imageExtensions || defaultImageExtensions;
-  const debug = opts.debug || false;
+  const logger = createLogger(opts.debug || false);
 
-  // Helper to check if a path ends with an image extension
+  // Helper to check for image paths
   const isImagePath = (path: string): boolean => {
     const result = imageExtensions.some(ext => 
       path.toLowerCase().endsWith(ext.toLowerCase())
     );
-    if (debug) {
-      console.log(`[Debug] Checking if path "${path}" is an image:`, result);
-      if (result) {
-        console.log(`[Debug] Matched image extension:`, 
-          imageExtensions.find(ext => path.toLowerCase().endsWith(ext.toLowerCase())));
-      }
-    }
+    logger.log(`Path "${path}" is image:`, result);
     return result;
   };
 
-  if (debug) {
-    console.log('[Debug] Parser initialized with options:', {
-      imageExtensions,
-      hasCustomToLink: !!opts.toLink,
-      hasCustomToImage: !!opts.toImage
-    });
-  }
+  // Configure wiki link plugin
+  this.use(wikiLinkPlugin, {
+    pathFormat: "obsidian-absolute",
+    aliasDivider: '|',
+    wikiLinkClassName: 'wiki-link',
+    newClassName: 'new',
+    hrefTemplate: (permalink: string) => `/${permalink}`
+  });
 
-  this.use(remarkWikiLink, { aliasDivider: '|' });
+  // Return transformer function
+  const transformer: Transformer<Root> = (tree) => {
+    logger.log('Starting transformation');
 
-  return (tree: any) => {
-    if (debug) {
-      console.log('[Debug] Starting tree transformation');
-    }
+    visit(tree, 'wikiLink', (node: WikiLinkNode, index: number, parent: any) => {
+      try {
+        // Normalize and process node
+        const normalizedNode = normalizeNode(node);
+        const wValue = normalizedNode.value;
+        const wAlias = normalizedNode.data?.alias || wValue;
 
-    visit(tree, 'wikiLink', (node, index, parent) => {
-      const wValue = node.value;
-      const wAlias = node.data.alias;
-      
-      if (debug) {
-        console.log('[Debug] Processing wiki link:', {
-          value: wValue,
-          alias: wAlias,
-          nodeType: node.type,
-          parentType: parent.type
-        });
+        const wikiLink = {
+          value: wValue.trim(),
+          alias: wAlias === wValue ? undefined : wAlias.trim(),
+        };
+
+        // Transform based on type
+        const isImage = isImagePath(wikiLink.value);
+        const transform = isImage ? toImage : toLink;
+        const link = transform(wikiLink);
+
+        // Create appropriate node
+        let newNode;
+        if (typeof link === 'string') {
+          newNode = isImage 
+            ? m.image(link, wikiLink.alias || '')
+            : m.text(link);
+        } else {
+          newNode = isImage
+            ? m.image(link.uri, link.title || '', link.value)
+            : m.link(link.uri, link.title, [m.text(link.value)]);
+        }
+
+        // Replace old node
+        parent.children.splice(index, 1, newNode);
+        return [SKIP, index];
+      } catch (error) {
+        logger.error('Processing error:', error);
+        return [SKIP, index];
       }
-
-      const wikiLink = {
-        value: wValue.trim(),
-        alias: wAlias === wValue ? undefined : wAlias.trim(),
-      };
-
-      // Determine if this is an image link
-      const isImage = isImagePath(wikiLink.value);
-      const transform = isImage ? toImage : toLink;
-
-      if (debug) {
-        console.log('[Debug] Link transformation:', {
-          isImage,
-          transformType: isImage ? 'toImage' : 'toLink',
-          wikiLink
-        });
-      }
-
-      const link = transform(wikiLink);
-
-      if (debug) {
-        console.log('[Debug] Transform result:', {
-          linkType: typeof link,
-          link
-        });
-      }
-
-      let newNode;
-      if (typeof link === 'string') {
-        newNode = isImage 
-          ? m.image(link, wikiLink.alias || '')
-          : m.text(link);
-      } else {
-        newNode = isImage
-          ? m.image(link.uri, link.title || '', link.value)
-          : m.link(link.uri, link.title, [m.text(link.value)]);
-      }
-
-      if (debug) {
-        console.log('[Debug] Created new node:', {
-          type: newNode.type,
-          properties: newNode,
-          replacedNodeType: node.type
-        });
-      }
-
-      parent.children.splice(index, 1, newNode);
-      return [SKIP, index];
     });
 
-    if (debug) {
-      console.log('[Debug] Completed tree transformation');
-    }
+    return tree;
   };
+
+  return transformer;
 };
 
-// Example usage with debug enabled:
+// Example usage:
 /*
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+
 const processor = unified()
   .use(remarkParse)
-  .use(myWikiParser, {
+  .use(remarkWikiParser, {
     toLink: ({ value, alias }) => ({
       uri: `/notes/${value.toLowerCase().replace(/ /g, '-')}`,
       title: alias,

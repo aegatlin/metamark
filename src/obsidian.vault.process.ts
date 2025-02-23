@@ -14,18 +14,22 @@ import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import { remarkObsidianLink } from "remark-obsidian-link";
+import { remarkObsidianLink } from "remark-obsidian-link"; //metadown version 
 import remarkParse from "remark-parse"; 
 import remarkRehype from "remark-rehype";
 import remarkImages from 'remark-images' //wip
-import wikiLinkPlugin from "@portaljs/remark-wiki-link"; ///wip 2
+//import wikiLinkPlugin from "@portaljs/remark-wiki-link"; ///wip 2
+import wikiLinkPlugin from 'remark-wiki-link-plus';
 import { unified } from "unified";
 import m from "./";
 import * as lib from "./lib";
 import { toLinkBuilder } from "./obsidian.vault.toLinkBuilder";
 import { Metamark } from "./types";
 
-import {myWikiParser} from './myWikiParser' //wip 3
+// import {remarkWikiParser} from './myWikiParser' //wip 3
+
+import remarkWikiParser from './myWikiParser2' //wip 3
+
 
 /**
  * Process an Obsidian vault directory and return file data for public files
@@ -90,9 +94,13 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
         .use(remarkGfm)
       
        // .use(wikiLinkPlugin, { pathFormat: "obsidian-absolute" })//  
-         // .use(remarkObsidianLink, { toLink })   //metadown version
+         .use(remarkObsidianLink, { toLink })   //metadown version
 
-          .use(myWikiParser, {
+       //  .use(wikiLinkPlugin )
+        // wikiLinkPlugin
+
+         /*
+          .use(remarkWikiParser, {
             debug:true,
             toLink, 
             toImage: ({ value, alias }) => ({
@@ -101,6 +109,7 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
             value: alias || value
           }),
         }) //wip 3
+         */
        
 
       //  .use(wikiLinkPlugin, { pathFormat: "obsidian-absolute" })//  

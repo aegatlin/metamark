@@ -1,90 +1,8 @@
-var __create = Object.create;
 var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-
-// node_modules/mdast-builder/lib/src/index.js
-var require_src = __commonJS({
-  "node_modules/mdast-builder/lib/src/index.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function normalizeChildren(children) {
-      if (Array.isArray(children)) {
-        return children;
-      } else if (typeof children === "function") {
-        const res = children();
-        return normalizeChildren(res);
-      } else if (typeof children === "undefined") {
-        return [];
-      } else {
-        return [children];
-      }
-    }
-    var valueNode = (type, value) => ({
-      type,
-      value
-    });
-    var nodeWithChildren = (type, kids) => ({
-      type,
-      children: normalizeChildren(kids)
-    });
-    exports.text = (value) => valueNode("text", value);
-    exports.inlineCode = (value) => valueNode("inlineCode", value);
-    exports.html = (value) => valueNode("html", value);
-    exports.strong = (kids) => nodeWithChildren("strong", kids);
-    exports.emphasis = (kids) => nodeWithChildren("emphasis", kids);
-    exports.strike = (kids) => nodeWithChildren("delete", kids);
-    exports.tableCell = (kids) => nodeWithChildren("tableCell", kids);
-    exports.tableRow = (kids) => nodeWithChildren("tableRow", kids);
-    exports.table = (align, kids) => Object.assign({}, nodeWithChildren("table", kids), { align });
-    exports.brk = Object.freeze({ type: "break" });
-    exports.separator = exports.text("---");
-    exports.link = (url, title = "", kids) => Object.assign({}, nodeWithChildren("link", kids), {
-      url,
-      title
-    });
-    exports.root = (kids) => nodeWithChildren("root", kids);
-    exports.rootWithTitle = (depth, title, kids) => {
-      return exports.root([exports.heading(depth, title), ...normalizeChildren(kids)]);
-    };
-    exports.paragraph = (kids) => nodeWithChildren("paragraph", kids);
-    exports.image = (url, title, alt, kids) => Object.assign({}, nodeWithChildren("image", kids), { url, title, alt });
-    exports.blockquote = (kids) => nodeWithChildren("blockquote", kids);
-    exports.code = (lang, value) => Object.assign({}, valueNode("code", value), { lang });
-    exports.heading = (depth, kids) => {
-      if (depth < 1)
-        throw new Error(`Invalid depth: ${depth}`);
-      return Object.assign({}, nodeWithChildren("heading", kids), { depth });
-    };
-    exports.list = (ordered, kids) => Object.assign({}, nodeWithChildren("list", kids), { ordered: ordered === "ordered" });
-    exports.listItem = (kids) => nodeWithChildren("listItem", kids);
-  }
-});
 
 // src/lib/hast.ts
 var hast_exports = {};
@@ -158,8 +76,8 @@ import slugify from "@sindresorhus/slugify";
 import matter from "gray-matter";
 import fs from "node:fs";
 import path from "node:path";
-function toSlug(s2) {
-  return slugify(s2, { decamelize: false });
+function toSlug(s) {
+  return slugify(s, { decamelize: false });
 }
 function getFileName(filePath) {
   const { name } = path.parse(filePath);
@@ -173,8 +91,8 @@ function getFrontmatterAndMd(filePath) {
     frontmatter: data
   };
 }
-function jsonStringify(o2) {
-  return JSON.stringify(o2, null, 2);
+function jsonStringify(o) {
+  return JSON.stringify(o, null, 2);
 }
 function writeToFileSync(filePath, content) {
   fs.writeFileSync(filePath, content, "utf8");
@@ -4504,14 +4422,14 @@ function javascript(hljs) {
           response.ignoreMatch();
         }
       }
-      let m2;
+      let m;
       const afterMatch = match.input.substring(afterMatchIndex);
-      if (m2 = afterMatch.match(/^\s*=/)) {
+      if (m = afterMatch.match(/^\s*=/)) {
         response.ignoreMatch();
         return;
       }
-      if (m2 = afterMatch.match(/^\s+extends\s+/)) {
-        if (m2.index === 0) {
+      if (m = afterMatch.match(/^\s+extends\s+/)) {
+        if (m.index === 0) {
           response.ignoreMatch();
           return;
         }
@@ -5914,11 +5832,11 @@ function less(hljs) {
   const INTERP_IDENT_RE = "(" + IDENT_RE3 + "|@\\{" + IDENT_RE3 + "\\})";
   const RULES = [];
   const VALUE_MODES = [];
-  const STRING_MODE = function(c3) {
+  const STRING_MODE = function(c2) {
     return {
       // Less strings are not multiline (also include '~' for more consistent coloring of "escaped" strings)
       className: "string",
-      begin: "~?" + c3 + ".*?" + c3
+      begin: "~?" + c2 + ".*?" + c2
     };
   };
   const IDENT_MODE = function(name, begin, relevance) {
@@ -6416,8 +6334,8 @@ function markdown(hljs) {
     ITALIC,
     BOLD_WITHOUT_ITALIC,
     ITALIC_WITHOUT_BOLD
-  ].forEach((m2) => {
-    m2.contains = m2.contains.concat(CONTAINABLE);
+  ].forEach((m) => {
+    m.contains = m.contains.concat(CONTAINABLE);
   });
   CONTAINABLE = CONTAINABLE.concat(BOLD, ITALIC);
   const HEADER = {
@@ -7210,11 +7128,11 @@ function php(hljs) {
     begin: /<<<[ \t]*(?:(\w+)|"(\w+)")\n/,
     end: /[ \t]*(\w+)\b/,
     contains: hljs.QUOTE_STRING_MODE.contains.concat(SUBST),
-    "on:begin": (m2, resp) => {
-      resp.data._beginMatch = m2[1] || m2[2];
+    "on:begin": (m, resp) => {
+      resp.data._beginMatch = m[1] || m[2];
     },
-    "on:end": (m2, resp) => {
-      if (resp.data._beginMatch !== m2[1]) resp.ignoreMatch();
+    "on:end": (m, resp) => {
+      if (resp.data._beginMatch !== m[1]) resp.ignoreMatch();
     }
   };
   const NOWDOC = hljs.END_SAME_AS_BEGIN({
@@ -11563,14 +11481,14 @@ function javascript2(hljs) {
           response.ignoreMatch();
         }
       }
-      let m2;
+      let m;
       const afterMatch = match.input.substring(afterMatchIndex);
-      if (m2 = afterMatch.match(/^\s*=/)) {
+      if (m = afterMatch.match(/^\s*=/)) {
         response.ignoreMatch();
         return;
       }
-      if (m2 = afterMatch.match(/^\s+extends\s+/)) {
-        if (m2.index === 0) {
+      if (m = afterMatch.match(/^\s+extends\s+/)) {
+        if (m.index === 0) {
           response.ignoreMatch();
           return;
         }
@@ -12130,7 +12048,7 @@ function typescript(hljs) {
     begin: "@" + IDENT_RE$1
   };
   const swapMode = (mode, label, replacement) => {
-    const indx = mode.contains.findIndex((m2) => m2.label === label);
+    const indx = mode.contains.findIndex((m) => m.label === label);
     if (indx === -1) {
       throw new Error("can not find mode to replace");
     }
@@ -12145,7 +12063,7 @@ function typescript(hljs) {
   ]);
   swapMode(tsLanguage, "shebang", hljs.SHEBANG());
   swapMode(tsLanguage, "use_strict", USE_STRICT);
-  const functionDeclaration = tsLanguage.contains.find((m2) => m2.label === "func.def");
+  const functionDeclaration = tsLanguage.contains.find((m) => m.label === "func.def");
   functionDeclaration.relevance = 0;
   Object.assign(tsLanguage, {
     name: "TypeScript",
@@ -12876,6 +12794,7 @@ import rehypeStringify from "rehype-stringify";
 import remarkCallouts from "remark-callouts";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+import { remarkObsidianLink } from "remark-obsidian-link";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -13008,231 +12927,6 @@ var Regex = {
   PageAndBlock: /.+#\^.+/
 };
 
-// src/myWikiParser.ts
-var import_mdast_builder = __toESM(require_src(), 1);
-
-// node_modules/remark-wiki-link/dist/index.js
-var e = { d: (t2, r3) => {
-  for (var n2 in r3) e.o(r3, n2) && !e.o(t2, n2) && Object.defineProperty(t2, n2, { enumerable: true, get: r3[n2] });
-}, o: (e2, t2) => Object.prototype.hasOwnProperty.call(e2, t2) };
-var t = {};
-e.d(t, { Z: () => h, $: () => k });
-var r2 = { horizontalTab: -2, virtualSpace: -1, nul: 0, eof: null, space: 32 };
-function n(e2) {
-  return e2 < r2.nul || e2 === r2.space;
-}
-function i(e2) {
-  return e2 < r2.horizontalTab;
-}
-var a = { 553: (e2) => {
-  e2.exports = function(e3) {
-    var t2, r3;
-    return e3._compiled || (t2 = e3.before ? "(?:" + e3.before + ")" : "", r3 = e3.after ? "(?:" + e3.after + ")" : "", e3.atBreak && (t2 = "[\\r\\n][\\t ]*" + t2), e3._compiled = new RegExp((t2 ? "(" + t2 + ")" : "") + (/[|\\{}()[\]^$+*?.-]/.test(e3.character) ? "\\" : "") + e3.character + (r3 || ""), "g")), e3._compiled;
-  };
-}, 112: (e2) => {
-  function t2(e3, t3, r3) {
-    var n2;
-    if (!t3) return r3;
-    for ("string" == typeof t3 && (t3 = [t3]), n2 = -1; ++n2 < t3.length; ) if (-1 !== e3.indexOf(t3[n2])) return true;
-    return false;
-  }
-  e2.exports = function(e3, r3) {
-    return t2(e3, r3.inConstruct, true) && !t2(e3, r3.notInConstruct);
-  };
-}, 113: (e2, t2, r3) => {
-  e2.exports = function(e3, t3, r4) {
-    for (var s2, u2, l2, c3, f2, k2, h2, p2, d2 = (r4.before || "") + (t3 || "") + (r4.after || ""), x = [], w = [], v = {}, g = -1; ++g < e3.unsafe.length; ) if (c3 = e3.unsafe[g], i2(e3.stack, c3)) for (f2 = n2(c3); k2 = f2.exec(d2); ) s2 = "before" in c3 || c3.atBreak, u2 = "after" in c3, l2 = k2.index + (s2 ? k2[1].length : 0), -1 === x.indexOf(l2) ? (x.push(l2), v[l2] = { before: s2, after: u2 }) : (v[l2].before && !s2 && (v[l2].before = false), v[l2].after && !u2 && (v[l2].after = false));
-    for (x.sort(a2), h2 = r4.before ? r4.before.length : 0, p2 = d2.length - (r4.after ? r4.after.length : 0), g = -1; ++g < x.length; ) (l2 = x[g]) < h2 || l2 >= p2 || l2 + 1 < p2 && x[g + 1] === l2 + 1 && v[l2].after && !v[l2 + 1].before && !v[l2 + 1].after || (h2 !== l2 && w.push(o2(d2.slice(h2, l2), "\\")), h2 = l2, !/[!-/:-@[-`{-~]/.test(d2.charAt(l2)) || r4.encode && -1 !== r4.encode.indexOf(d2.charAt(l2)) ? (w.push("&#x" + d2.charCodeAt(l2).toString(16).toUpperCase() + ";"), h2++) : w.push("\\"));
-    return w.push(o2(d2.slice(h2, p2), r4.after)), w.join("");
-  };
-  var n2 = r3(553), i2 = r3(112);
-  function a2(e3, t3) {
-    return e3 - t3;
-  }
-  function o2(e3, t3) {
-    for (var r4, n3 = /\\(?=[!-/:-@[-`{-~])/g, i3 = [], a3 = [], o3 = -1, s2 = 0, u2 = e3 + t3; r4 = n3.exec(u2); ) i3.push(r4.index);
-    for (; ++o3 < i3.length; ) s2 !== i3[o3] && a3.push(e3.slice(s2, i3[o3])), a3.push("\\"), s2 = i3[o3];
-    return a3.push(e3.slice(s2)), a3.join("");
-  }
-} };
-var o = {};
-function s(e2) {
-  var t2 = o[e2];
-  if (void 0 !== t2) return t2.exports;
-  var r3 = o[e2] = { exports: {} };
-  return a[e2](r3, r3.exports, s), r3.exports;
-}
-s.n = (e2) => {
-  var t2 = e2 && e2.__esModule ? () => e2.default : () => e2;
-  return s.d(t2, { a: t2 }), t2;
-}, s.d = (e2, t2) => {
-  for (var r3 in t2) s.o(t2, r3) && !s.o(e2, r3) && Object.defineProperty(e2, r3, { enumerable: true, get: t2[r3] });
-}, s.o = (e2, t2) => Object.prototype.hasOwnProperty.call(e2, t2);
-var u = {};
-(() => {
-  function e2(e3 = {}) {
-    const t3 = e3.permalinks || [], r4 = e3.pageResolver || ((e4) => [e4.replace(/ /g, "_").toLowerCase()]), n3 = e3.newClassName || "new", i2 = e3.wikiLinkClassName || "internal", a2 = e3.hrefTemplate || ((e4) => `#/page/${e4}`);
-    let o2;
-    function s2(e4) {
-      return e4[e4.length - 1];
-    }
-    return { enter: { wikiLink: function(e4) {
-      o2 = { type: "wikiLink", value: null, data: { alias: null, permalink: null, exists: null } }, this.enter(o2, e4);
-    } }, exit: { wikiLinkTarget: function(e4) {
-      const t4 = this.sliceSerialize(e4);
-      s2(this.stack).value = t4;
-    }, wikiLinkAlias: function(e4) {
-      const t4 = this.sliceSerialize(e4);
-      s2(this.stack).data.alias = t4;
-    }, wikiLink: function(e4) {
-      this.exit(e4);
-      const s3 = o2, u2 = r4(s3.value), l2 = u2.find((e5) => -1 !== t3.indexOf(e5)), c3 = void 0 !== l2;
-      let f2;
-      f2 = c3 ? l2 : u2[0] || "";
-      let k2 = s3.value;
-      s3.data.alias && (k2 = s3.data.alias);
-      let h2 = i2;
-      c3 || (h2 += " " + n3), s3.data.alias = k2, s3.data.permalink = f2, s3.data.exists = c3, s3.data.hName = "a", s3.data.hProperties = { className: h2, href: a2(f2) }, s3.data.hChildren = [{ type: "text", value: k2 }];
-    } } };
-  }
-  s.d(u, { V: () => e2, x: () => n2 });
-  var t2 = s(113), r3 = s.n(t2);
-  function n2(e3 = {}) {
-    const t3 = e3.aliasDivider || ":";
-    return { unsafe: [{ character: "[", inConstruct: ["phrasing", "label", "reference"] }, { character: "]", inConstruct: ["label", "reference"] }], handlers: { wikiLink: function(e4, n3, i2) {
-      const a2 = i2.enter("wikiLink"), o2 = r3()(i2, e4.value, { before: "[", after: "]" }), s2 = r3()(i2, e4.data.alias, { before: "[", after: "]" });
-      let u2;
-      return u2 = s2 !== o2 ? `[[${o2}${t3}${s2}]]` : `[[${o2}]]`, a2(), u2;
-    } } };
-  }
-})();
-var l = u.V;
-var c2 = u.x;
-var f = false;
-function k(e2 = {}) {
-  const t2 = this.data();
-  function a2(e3, r3) {
-    t2[e3] ? t2[e3].push(r3) : t2[e3] = [r3];
-  }
-  !f && (this.Parser && this.Parser.prototype && this.Parser.prototype.blockTokenizers || this.Compiler && this.Compiler.prototype && this.Compiler.prototype.visitors) && (f = true, console.warn("[remark-wiki-link] Warning: please upgrade to remark 13 to use this plugin")), a2("micromarkExtensions", function() {
-    var e3 = (arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : {}).aliasDivider || ":", t3 = "]]";
-    return { text: { 91: { tokenize: function(a3, o2, s2) {
-      var u2, l2, c3 = 0, f2 = 0, k2 = 0;
-      return function(e4) {
-        return e4 !== "[[".charCodeAt(f2) ? s2(e4) : (a3.enter("wikiLink"), a3.enter("wikiLinkMarker"), h2(e4));
-      };
-      function h2(e4) {
-        return 2 === f2 ? (a3.exit("wikiLinkMarker"), function(e5) {
-          return i(e5) || e5 === r2.eof ? s2(e5) : (a3.enter("wikiLinkData"), a3.enter("wikiLinkTarget"), p2(e5));
-        }(e4)) : e4 !== "[[".charCodeAt(f2) ? s2(e4) : (a3.consume(e4), f2++, h2);
-      }
-      function p2(o3) {
-        return o3 === e3.charCodeAt(c3) ? u2 ? (a3.exit("wikiLinkTarget"), a3.enter("wikiLinkAliasMarker"), d2(o3)) : s2(o3) : o3 === t3.charCodeAt(k2) ? u2 ? (a3.exit("wikiLinkTarget"), a3.exit("wikiLinkData"), a3.enter("wikiLinkMarker"), w(o3)) : s2(o3) : i(o3) || o3 === r2.eof ? s2(o3) : (n(o3) || (u2 = true), a3.consume(o3), p2);
-      }
-      function d2(t4) {
-        return c3 === e3.length ? (a3.exit("wikiLinkAliasMarker"), a3.enter("wikiLinkAlias"), x(t4)) : t4 !== e3.charCodeAt(c3) ? s2(t4) : (a3.consume(t4), c3++, d2);
-      }
-      function x(e4) {
-        return e4 === t3.charCodeAt(k2) ? l2 ? (a3.exit("wikiLinkAlias"), a3.exit("wikiLinkData"), a3.enter("wikiLinkMarker"), w(e4)) : s2(e4) : i(e4) || e4 === r2.eof ? s2(e4) : (n(e4) || (l2 = true), a3.consume(e4), x);
-      }
-      function w(e4) {
-        return 2 === k2 ? (a3.exit("wikiLinkMarker"), a3.exit("wikiLink"), o2(e4)) : e4 !== t3.charCodeAt(k2) ? s2(e4) : (a3.consume(e4), k2++, w);
-      }
-    } } } };
-  }(e2)), a2("fromMarkdownExtensions", l(e2)), a2("toMarkdownExtensions", c2(e2));
-}
-var h = k;
-var p = t.Z;
-var d = t.$;
-
-// src/myWikiParser.ts
-import { SKIP, visit as visit2 } from "unist-util-visit";
-var defaultImageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"];
-var myWikiParser = function(opts = {}) {
-  const toLink = opts.toLink || (({ value, alias }) => alias || value);
-  const toImage = opts.toImage || toLink;
-  const imageExtensions = opts.imageExtensions || defaultImageExtensions;
-  const debug = opts.debug || false;
-  const isImagePath = (path3) => {
-    const result = imageExtensions.some(
-      (ext) => path3.toLowerCase().endsWith(ext.toLowerCase())
-    );
-    if (debug) {
-      console.log(`[Debug] Checking if path "${path3}" is an image:`, result);
-      if (result) {
-        console.log(
-          `[Debug] Matched image extension:`,
-          imageExtensions.find((ext) => path3.toLowerCase().endsWith(ext.toLowerCase()))
-        );
-      }
-    }
-    return result;
-  };
-  if (debug) {
-    console.log("[Debug] Parser initialized with options:", {
-      imageExtensions,
-      hasCustomToLink: !!opts.toLink,
-      hasCustomToImage: !!opts.toImage
-    });
-  }
-  this.use(p, { aliasDivider: "|" });
-  return (tree) => {
-    if (debug) {
-      console.log("[Debug] Starting tree transformation");
-    }
-    visit2(tree, "wikiLink", (node, index, parent) => {
-      const wValue = node.value;
-      const wAlias = node.data.alias;
-      if (debug) {
-        console.log("[Debug] Processing wiki link:", {
-          value: wValue,
-          alias: wAlias,
-          nodeType: node.type,
-          parentType: parent.type
-        });
-      }
-      const wikiLink = {
-        value: wValue.trim(),
-        alias: wAlias === wValue ? void 0 : wAlias.trim()
-      };
-      const isImage = isImagePath(wikiLink.value);
-      const transform = isImage ? toImage : toLink;
-      if (debug) {
-        console.log("[Debug] Link transformation:", {
-          isImage,
-          transformType: isImage ? "toImage" : "toLink",
-          wikiLink
-        });
-      }
-      const link = transform(wikiLink);
-      if (debug) {
-        console.log("[Debug] Transform result:", {
-          linkType: typeof link,
-          link
-        });
-      }
-      let newNode;
-      if (typeof link === "string") {
-        newNode = isImage ? import_mdast_builder.default.image(link, wikiLink.alias || "") : import_mdast_builder.default.text(link);
-      } else {
-        newNode = isImage ? import_mdast_builder.default.image(link.uri, link.title || "", link.value) : import_mdast_builder.default.link(link.uri, link.title, [import_mdast_builder.default.text(link.value)]);
-      }
-      if (debug) {
-        console.log("[Debug] Created new node:", {
-          type: newNode.type,
-          properties: newNode,
-          replacedNodeType: node.type
-        });
-      }
-      parent.children.splice(index, 1, newNode);
-      return [SKIP, index];
-    });
-    if (debug) {
-      console.log("[Debug] Completed tree transformation");
-    }
-  };
-};
-
 // src/obsidian.vault.process.ts
 function obsidianVaultProcess(dirPath, opts) {
   dirPath = path2.normalize(dirPath);
@@ -13267,15 +12961,7 @@ function obsidianVaultProcess(dirPath, opts) {
   return pages;
 }
 var unifiedProcessorBuilder = ({ toLink }) => {
-  return unified().use(remarkParse).use(remarkGfm).use(myWikiParser, {
-    debug: true,
-    toLink,
-    toImage: ({ value, alias }) => ({
-      uri: `/assets/${value}`,
-      title: alias,
-      value: alias || value
-    })
-  }).use(remarkCallouts).use(remarkMath).use(remarkRehype).use(rehypeExternalLinks).use(rehypeSlug).use(rehypeAutolinkHeadings, { behavior: "wrap" }).use(rehypeHighlight, {
+  return unified().use(remarkParse).use(remarkGfm).use(remarkObsidianLink, { toLink }).use(remarkCallouts).use(remarkMath).use(remarkRehype).use(rehypeExternalLinks).use(rehypeSlug).use(rehypeAutolinkHeadings, { behavior: "wrap" }).use(rehypeHighlight, {
     languages: { ...grammars, elixir }
   }).use(rehypeMathjaxChtml, {
     chtml: {

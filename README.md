@@ -1,6 +1,12 @@
-# Metamark
+# Obsidian parser
 
 A markdown utility.
+
+This is a form from metamark that aims to add features like:
+
+- includes CLI utilities
+- image + ress parsing
+- more customization
 
 ## Obsidian
 
