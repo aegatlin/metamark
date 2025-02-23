@@ -26,10 +26,11 @@ Obsidian Parser can:
 - [ ] Extended customization options for flexible workflow integration
 - [ ] Youtube embeds (just paste a youtube link)
 - [ ] Parametric config to enable/disable different modules, and pass options to processing module.
-
 - [ ] Good documentaiton
+  - [x] Basi feature roadmap
   - [ ] Github actions examples
   - [ ] CLI usage examples
+- [ ] Sample front-end examples (react, express, vue)
 
 ## CLI Usage
 
@@ -57,7 +58,11 @@ Run the conversion with additional debugging information:
 npm run convert:dev -- -i /path/to/vault
 ```
 
-# Similar projects
+# Similar projects & ressources
+
+https://unifiedjs.com/learn/guide/using-unified/
+
+- Main Framework used to parse and transform text. [intro guide](https://unifiedjs.com/learn/guide/introduction-to-unified/)
 
 https://github.com/aegatlin/metamark/tree/main/test
 
