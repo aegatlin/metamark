@@ -12955,7 +12955,6 @@ function obsidianVaultProcess(dirPath, opts) {
       html: htmlString,
       toc: hast_exports.getToc(htmlString),
       originalFilePath: relativePath
-      // Now relative to vault root
     };
     pages.push(file);
   }
@@ -12971,18 +12970,23 @@ var unifiedProcessorBuilder = ({ toLink }) => {
   }).use(rehypeStringify);
 };
 var defaultFilePathAllowSetBuilder = (dirPath) => {
-  const dirEntries = fs2.readdirSync(dirPath, { withFileTypes: true });
   const filePathAllowSet = /* @__PURE__ */ new Set();
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const filePath = path2.join(dirPath, dirEntry.name);
-      const raw = fs2.readFileSync(filePath, "utf8");
-      const { data: frontmatter } = matter2(raw);
-      if (!!frontmatter?.public) {
-        filePathAllowSet.add(filePath);
+  function scanDirectory(currentPath) {
+    const dirEntries = fs2.readdirSync(currentPath, { withFileTypes: true });
+    dirEntries.forEach((dirEntry) => {
+      const entryPath = path2.join(currentPath, dirEntry.name);
+      if (dirEntry.isDirectory()) {
+        scanDirectory(entryPath);
+      } else if (dirEntry.isFile()) {
+        const raw = fs2.readFileSync(entryPath, "utf8");
+        const { data: frontmatter } = matter2(raw);
+        if (frontmatter?.public) {
+          filePathAllowSet.add(entryPath);
+        }
       }
-    }
-  });
+    });
+  }
+  scanDirectory(dirPath);
   return filePathAllowSet;
 };
 

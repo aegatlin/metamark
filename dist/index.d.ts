@@ -89,6 +89,9 @@ declare namespace Metamark {
     }
 }
 
+/**
+ * Process an Obsidian vault directory and return file data for public files
+ */
 declare function obsidianVaultProcess(dirPath: string, opts?: Metamark.Obsidian.Vault.ProcessOptions): Metamark.Obsidian.Vault.FileData[];
 
 declare const metamark: {

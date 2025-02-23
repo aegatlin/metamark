@@ -12985,7 +12985,6 @@ function obsidianVaultProcess(dirPath, opts) {
       html: htmlString,
       toc: hast_exports.getToc(htmlString),
       originalFilePath: relativePath
-      // Now relative to vault root
     };
     pages.push(file);
   }
@@ -13001,18 +13000,23 @@ var unifiedProcessorBuilder = ({ toLink }) => {
   }).use(import_rehype_stringify.default);
 };
 var defaultFilePathAllowSetBuilder = (dirPath) => {
-  const dirEntries = import_node_fs2.default.readdirSync(dirPath, { withFileTypes: true });
   const filePathAllowSet = /* @__PURE__ */ new Set();
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const filePath = import_node_path2.default.join(dirPath, dirEntry.name);
-      const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
-      const { data: frontmatter } = (0, import_gray_matter2.default)(raw);
-      if (!!frontmatter?.public) {
-        filePathAllowSet.add(filePath);
+  function scanDirectory(currentPath) {
+    const dirEntries = import_node_fs2.default.readdirSync(currentPath, { withFileTypes: true });
+    dirEntries.forEach((dirEntry) => {
+      const entryPath = import_node_path2.default.join(currentPath, dirEntry.name);
+      if (dirEntry.isDirectory()) {
+        scanDirectory(entryPath);
+      } else if (dirEntry.isFile()) {
+        const raw = import_node_fs2.default.readFileSync(entryPath, "utf8");
+        const { data: frontmatter } = (0, import_gray_matter2.default)(raw);
+        if (frontmatter?.public) {
+          filePathAllowSet.add(entryPath);
+        }
       }
-    }
-  });
+    });
+  }
+  scanDirectory(dirPath);
   return filePathAllowSet;
 };
 

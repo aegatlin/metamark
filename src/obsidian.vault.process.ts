@@ -23,14 +23,15 @@ import * as lib from "./lib";
 import { toLinkBuilder } from "./obsidian.vault.toLinkBuilder";
 import { Metamark } from "./types";
 
- 
-
+/**
+ * Process an Obsidian vault directory and return file data for public files
+ */
 export function obsidianVaultProcess(
   dirPath: string,
   opts?: Metamark.Obsidian.Vault.ProcessOptions,
 ): Metamark.Obsidian.Vault.FileData[] {
-   // Normalize the input path first
-   dirPath = path.normalize(dirPath);
+  // Normalize the input path first
+  dirPath = path.normalize(dirPath);
    
   // handle options
   const filePathAllowSet =
@@ -68,7 +69,7 @@ export function obsidianVaultProcess(
       firstParagraphText: lib.mdast.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
       toc: lib.hast.getToc(htmlString),
-      originalFilePath: relativePath, // Now relative to vault root
+      originalFilePath: relativePath,
     };
 
     pages.push(file);
@@ -112,21 +113,28 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
  */
 const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
   (dirPath) => {
-    const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
-
     const filePathAllowSet = new Set<string>();
 
-    dirEntries.forEach((dirEntry) => {
-      if (dirEntry.isFile()) {
-        const filePath = path.join(dirPath, dirEntry.name);
-        const raw = fs.readFileSync(filePath, "utf8");
-        const { data: frontmatter } = matter(raw);
+    function scanDirectory(currentPath: string) {
+      const dirEntries = fs.readdirSync(currentPath, { withFileTypes: true });
 
-        if (!!frontmatter?.public) {
-          filePathAllowSet.add(filePath);
+      dirEntries.forEach((dirEntry) => {
+        const entryPath = path.join(currentPath, dirEntry.name);
+
+        if (dirEntry.isDirectory()) {
+          // Recursively scan subdirectories
+          scanDirectory(entryPath);
+        } else if (dirEntry.isFile()) {
+          const raw = fs.readFileSync(entryPath, "utf8");
+          const { data: frontmatter } = matter(raw);
+
+          if (frontmatter?.public) {
+            filePathAllowSet.add(entryPath);
+          }
         }
-      }
-    });
+      });
+    }
 
+    scanDirectory(dirPath);
     return filePathAllowSet;
   };
