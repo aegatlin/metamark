@@ -1,6 +1,6 @@
 # Obsidian Parser
 
-The Obsidian CMS.
+Turn Obsidian into your CMS.
 
 Obsidian Parser is a powerful markdown utility to publish your Obsidian vault content.
 
