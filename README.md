@@ -7,6 +7,7 @@ A powerful markdown utility built on top of Metamark that enhances your Obsidian
 - [x] Single-line conversion to JSON for efficient data transformation
 - [x] Comprehensive CLI utilities and npm scripts for easy automation
 - [x] Customizable link prefix to match your frontend routing requirements
+- [x] Provide original note path as prop
 - [ ] Advanced image and resource parsing for Obsidian's `![[filename]]` syntax
 - [ ] Configurable assets URL prefix supporting CDN hosting and image-resizing
 - [ ] Optional image pre-processing scripts for streamlined hosting
