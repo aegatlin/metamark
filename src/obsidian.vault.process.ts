@@ -53,6 +53,9 @@ export function obsidianVaultProcess(
     const mdastRoot: MdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
 
+    // Calculate relative path from vault root
+    const relativePath = path.relative(dirPath, filePath);
+
     const file: Metamark.Obsidian.Vault.FileData = {
       fileName,
       slug: slugify(fileName, { decamelize: false }),
@@ -60,7 +63,7 @@ export function obsidianVaultProcess(
       firstParagraphText: lib.mdast.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
       toc: lib.hast.getToc(htmlString),
-      originalFilePath: filePath, //TODO: make relative to vault root
+      originalFilePath: relativePath, // Now relative to vault root
     };
 
     pages.push(file);

@@ -12975,6 +12975,7 @@ function obsidianVaultProcess(dirPath, opts) {
     const { content: md, data: frontmatter } = (0, import_gray_matter2.default)(raw);
     const mdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
+    const relativePath = import_node_path2.default.relative(dirPath, filePath);
     const file = {
       fileName,
       slug: (0, import_slugify2.default)(fileName, { decamelize: false }),
@@ -12982,7 +12983,8 @@ function obsidianVaultProcess(dirPath, opts) {
       firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
       toc: hast_exports.getToc(htmlString),
-      originalFilePath: filePath
+      originalFilePath: relativePath
+      // Now relative to vault root
     };
     pages.push(file);
   }
