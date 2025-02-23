@@ -26,7 +26,10 @@ Obsidian Parser can:
 - [ ] Extended customization options for flexible workflow integration
 - [ ] Youtube embeds (just paste a youtube link)
 - [ ] Parametric config to enable/disable different modules, and pass options to processing module.
+
 - [ ] Good documentaiton
+  - [ ] Github actions examples
+  - [ ] CLI usage examples
 
 ## CLI Usage
 
