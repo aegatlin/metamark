@@ -1,6 +1,14 @@
 # Obsidian Parser
 
-A powerful markdown utility built on top of Metamark that enhances your Obsidian vault processing capabilities.
+The Obsidian CMS.
+
+Obsidian Parser is a powerful markdown utility to publish your Obsidian vault content.
+
+Obsidian Parser can:
+
+- Render all your Obsidian notes as HTML
+- Compile all data (filename, properties, slug) in a big JSON file
+- Let you publish your notes in a custom front-end (not provided, this is a data utility)
 
 ## Features
 
