@@ -2,11 +2,16 @@
 
 A markdown utility.
 
-This is a form from metamark that aims to add features like:
+This is a form from metamark that aims to add extra features like:
 
-- includes CLI utilities
-- image + ress parsing
-- more customization
+[x] single-line conversion to JSON
+[x] includes CLI utilities and npm script.
+[x] custom link prefix to match your frontend routes
+[] image + ress parsing for obsidian ![[filename]] syntax
+[] custom assets url prefix (for CDN hosting or image-resizing)
+[] optional image-pre-processing scripts for easy hosting
+[] link graph extraction (backlinks of each-files + ressource)
+[] more customization options
 
 ## CLI usage
 
@@ -22,7 +27,9 @@ npm run convert:example
 
 npm run convert:dev -- -i /path/to/vault
 
-# Obsidian
+---
+
+# metamatk doc:
 
 A primary use case for metamark is processing Obsidian vaults.
 
