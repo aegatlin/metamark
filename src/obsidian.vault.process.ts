@@ -23,10 +23,15 @@ import * as lib from "./lib";
 import { toLinkBuilder } from "./obsidian.vault.toLinkBuilder";
 import { Metamark } from "./types";
 
+ 
+
 export function obsidianVaultProcess(
   dirPath: string,
   opts?: Metamark.Obsidian.Vault.ProcessOptions,
 ): Metamark.Obsidian.Vault.FileData[] {
+   // Normalize the input path first
+   dirPath = path.normalize(dirPath);
+   
   // handle options
   const filePathAllowSet =
     opts?.filePathAllowSetBuilder?.(dirPath) ??

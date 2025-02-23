@@ -12959,6 +12959,7 @@ var Regex = {
 
 // src/obsidian.vault.process.ts
 function obsidianVaultProcess(dirPath, opts) {
+  dirPath = import_node_path2.default.normalize(dirPath);
   const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultFilePathAllowSetBuilder(dirPath);
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
