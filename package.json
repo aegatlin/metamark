@@ -24,6 +24,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@portaljs/remark-wiki-link": "^1.2.0",
     "@sindresorhus/slugify": "^2.2.1",
     "gray-matter": "^4.0.3",
     "hast-util-from-html": "^2.0.2",
@@ -39,6 +40,7 @@
     "remark": "^15.0.1",
     "remark-callouts": "^2.0.0",
     "remark-gfm": "^4.0.0",
+    "remark-images": "^4.1.0",
     "remark-math": "^6.0.0",
     "remark-obsidian-link": "^0.2.4",
     "remark-parse": "^11.0.0",
