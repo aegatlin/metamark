@@ -67,8 +67,8 @@ declare namespace Metamark {
                  * ```
                  */
                 toLinkBuilderOpts?: ToLinkBuilderOpts;
-                contentPathPrefix?: string;
-                imgPathPrefix?: string;
+                notePathPrefix?: string;
+                assetPathPrefix?: string;
             }
             type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
             type UnifiedProcessorBuilder = (_: {
@@ -77,6 +77,10 @@ declare namespace Metamark {
             type ToLinkBuilderOpts = {
                 filePathAllowSet: Set<string>;
                 toSlug: (s: string) => string;
+                /**
+               * The prefix to use for links. If notePathPrefix is provided in ProcessOptions,
+               * it will override the default '/content'
+               */
                 prefix: string;
             };
             type ToLinkBuilder = (_: ToLinkBuilderOpts) => ToLink;

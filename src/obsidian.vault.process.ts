@@ -42,7 +42,7 @@ export function obsidianVaultProcess(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
       toSlug: m.utility.toSlug,
-      prefix: "/content",
+      prefix: opts?.notePathPrefix ?? "/content",
     },
   );
 

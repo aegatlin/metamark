@@ -12935,7 +12935,7 @@ function obsidianVaultProcess(dirPath, opts) {
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
       toSlug: src_default.utility.toSlug,
-      prefix: "/content"
+      prefix: opts?.notePathPrefix ?? "/content"
     }
   );
   const processor = unifiedProcessorBuilder({ toLink });

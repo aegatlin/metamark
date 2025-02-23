@@ -69,8 +69,8 @@ export namespace Metamark {
          * ```
          */
         toLinkBuilderOpts?: ToLinkBuilderOpts;
-        contentPathPrefix?: string;
-        imgPathPrefix?: string;
+        notePathPrefix?: string;
+        assetPathPrefix?: string;
       }
 
       export type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
@@ -82,6 +82,10 @@ export namespace Metamark {
       export type ToLinkBuilderOpts = {
         filePathAllowSet: Set<string>;
         toSlug: (s: string) => string;
+          /**
+         * The prefix to use for links. If notePathPrefix is provided in ProcessOptions,
+         * it will override the default '/content'
+         */
         prefix: string;
       };
 
