@@ -70,7 +70,7 @@ export namespace Metamark {
          */
         toLinkBuilderOpts?: ToLinkBuilderOpts;
         notePathPrefix?: string;
-        assetPathPrefix?: string;
+        assetPathPrefix?: string; // WIP
       }
 
       export type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
