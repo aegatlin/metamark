@@ -6,9 +6,9 @@ A markdown utility.
 
 A primary use case for metamark is processing Obsidian vaults.
 
-If you have an Obsidian vault, you want to share some or all of the content of
-that vault, and the popular methods of doing so (e.g., Obsidian Publish) are
-undesirable, then this might be a good reason to try metamark.
+An example use case for trying metamark is that you have an Obsidian vault and
+you want to share some or all of the content of that vault but the popular
+methods of doing so (e.g., Obsidian Publish) are undesirable.
 
 ```ts
 import metamark from "metamark";
@@ -31,9 +31,9 @@ when a linked file is public/private? This includes both what is displayed and,
 if public, what the link URL is.
 
 This is a complicated issue, and controlling the behavior results in complicated
-options when you call `m.obsidian.vault.process(dirPath, opts)`. Please see
-[types.ts](./src/types.ts) jsdocs for `Metamark.Obsidian.Vault.ProcessOpts` to
-learn more.
+options when you call `metamark.obsidian.vault.process(dirPath, opts)`. Please
+see [types.ts](./src/types.ts) jsdocs for `Metamark.Obsidian.Vault.ProcessOpts`
+to learn more.
 
 ## Publishing
 
