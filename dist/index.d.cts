@@ -12,6 +12,7 @@ declare namespace Metamark {
                 fileName: string;
                 slug: string;
                 firstParagraphText: string;
+                plain: string;
                 frontmatter: Record<string, any>;
                 html: string;
                 toc: TocItem[];

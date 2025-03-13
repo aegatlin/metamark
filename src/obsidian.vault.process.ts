@@ -75,8 +75,10 @@ export function obsidianVaultProcess(
       slug: slugify(fileName, { decamelize: false }),
       frontmatter,
       firstParagraphText: lib.mdast.getFirstParagraphText(mdastRoot) ?? "",
+      plain:  lib.hast.getPlainText(htmlString), // for text2speech, or for plain text emails.  
+   
       html: htmlString,
-      toc: lib.hast.getToc(htmlString),
+        toc: lib.hast.getToc(htmlString),
       originalFilePath: relativePath,
     };
 

@@ -18,6 +18,7 @@ Obsidian Parser can:
 - [x] Provide original note path as prop
 - [x] Hide all private notes (set a `public: true` property to publish)
 - [x] automatic, Url-friendly, slug generation
+- [ ] Rewrite links to replace regular links with custom slugs. Log errors to the console. Possible Throw error to prevent issues.
 - [ ] Set custom slugs on notes (via `slug` property)
 - [ ] Advanced image and resource parsing for assets's unnique wiki `![[filename]]` syntax
 - [ ] Configurable assets URL prefix (just dump your vault images and assets in a public folder or CDN)
@@ -59,6 +60,10 @@ Run the conversion with additional debugging information:
 ```bash
 npm run convert:dev -- -i /path/to/vault
 ```
+
+# Dev
+
+Don't forget to build the lib to rebuild the dist before testing.
 
 # Similar projects & ressources
 
