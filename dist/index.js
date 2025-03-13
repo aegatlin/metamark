@@ -7,6 +7,7 @@ var __export = (target, all) => {
 // src/lib/hast.ts
 var hast_exports = {};
 __export(hast_exports, {
+  getPlainText: () => getPlainText,
   getToc: () => getToc
 });
 import { fromHtml } from "hast-util-from-html";
@@ -48,6 +49,60 @@ function getToc(htmlString) {
     });
   });
   return flatToc;
+}
+function getPlainText(htmlString) {
+  const hast = fromHtml(htmlString);
+  let plainText = "";
+  let lastNodeWasBlock = false;
+  function extractText(node) {
+    if (node.tagName === "script" || node.tagName === "style") {
+      return;
+    }
+    const isBlockElement = node.tagName && [
+      "p",
+      "div",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "blockquote",
+      "pre",
+      "table",
+      "ul",
+      "ol",
+      "li",
+      "section",
+      "article",
+      "header",
+      "footer"
+    ].includes(node.tagName);
+    if (isBlockElement && plainText.length > 0 && !lastNodeWasBlock) {
+      plainText += "\n";
+      lastNodeWasBlock = true;
+    }
+    if (node.tagName === "br") {
+      plainText += "\n";
+      lastNodeWasBlock = true;
+      return;
+    }
+    if (node.type === "text") {
+      plainText += node.value;
+      lastNodeWasBlock = false;
+    }
+    if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        extractText(child);
+      }
+    }
+    if (isBlockElement) {
+      plainText += "\n";
+      lastNodeWasBlock = true;
+    }
+  }
+  extractText(hast);
+  return plainText.replace(/\n{3,}/g, "\n\n").replace(/[ \t]+/g, " ").trim();
 }
 
 // src/lib/mdast.ts
@@ -12929,12 +12984,13 @@ var Regex = {
 
 // src/obsidian.vault.process.ts
 function obsidianVaultProcess(dirPath, opts) {
+  dirPath = path2.normalize(dirPath);
   const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultFilePathAllowSetBuilder(dirPath);
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
       toSlug: src_default.utility.toSlug,
-      prefix: "/content"
+      prefix: opts?.notePathPrefix ?? "/content"
     }
   );
   const processor = unifiedProcessorBuilder({ toLink });
@@ -12945,13 +13001,17 @@ function obsidianVaultProcess(dirPath, opts) {
     const { content: md, data: frontmatter } = matter2(raw);
     const mdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
+    const relativePath = path2.relative(dirPath, filePath);
     const file = {
       fileName,
       slug: slugify2(fileName, { decamelize: false }),
       frontmatter,
       firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
+      plain: hast_exports.getPlainText(htmlString),
+      // for test2 speech. Doesnt work :()
       html: htmlString,
-      toc: hast_exports.getToc(htmlString)
+      toc: hast_exports.getToc(htmlString),
+      originalFilePath: relativePath
     };
     pages.push(file);
   }
@@ -12967,18 +13027,23 @@ var unifiedProcessorBuilder = ({ toLink }) => {
   }).use(rehypeStringify);
 };
 var defaultFilePathAllowSetBuilder = (dirPath) => {
-  const dirEntries = fs2.readdirSync(dirPath, { withFileTypes: true });
   const filePathAllowSet = /* @__PURE__ */ new Set();
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const filePath = path2.join(dirPath, dirEntry.name);
-      const raw = fs2.readFileSync(filePath, "utf8");
-      const { data: frontmatter } = matter2(raw);
-      if (!!frontmatter?.public) {
-        filePathAllowSet.add(filePath);
+  function scanDirectory(currentPath) {
+    const dirEntries = fs2.readdirSync(currentPath, { withFileTypes: true });
+    dirEntries.forEach((dirEntry) => {
+      const entryPath = path2.join(currentPath, dirEntry.name);
+      if (dirEntry.isDirectory()) {
+        scanDirectory(entryPath);
+      } else if (dirEntry.isFile()) {
+        const raw = fs2.readFileSync(entryPath, "utf8");
+        const { data: frontmatter } = matter2(raw);
+        if (frontmatter?.public) {
+          filePathAllowSet.add(entryPath);
+        }
       }
-    }
-  });
+    });
+  }
+  scanDirectory(dirPath);
   return filePathAllowSet;
 };
 

@@ -51,3 +51,72 @@ export function getToc(htmlString: string): Metamark.TocItem[] {
 
   return flatToc;
 }
+
+
+
+/**
+ * Extracts plain text content from HTML, preserving paragraph structure for TTS models
+ * @param htmlString The HTML string to extract text from
+ * @returns Plain text content with paragraph breaks preserved
+ */
+export function getPlainText(htmlString: string): string {
+  const hast: HastRoot = fromHtml(htmlString);
+  let plainText = '';
+  let lastNodeWasBlock = false;
+  
+  // Function to recursively extract text from nodes
+  function extractText(node: any): void {
+    // Skip script and style nodes entirely
+    if (node.tagName === 'script' || node.tagName === 'style') {
+      return;
+    }
+    
+    // Check if this is a block-level element that should cause paragraph breaks
+    const isBlockElement = node.tagName && [
+      'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+      'blockquote', 'pre', 'table', 'ul', 'ol', 'li',
+      'section', 'article', 'header', 'footer'
+    ].includes(node.tagName);
+    
+    // Add a newline before block elements (if we're not already at the start)
+    if (isBlockElement && plainText.length > 0 && !lastNodeWasBlock) {
+      plainText += '\n';
+      lastNodeWasBlock = true;
+    }
+    
+    // If this is a line break element, add a newline
+    if (node.tagName === 'br') {
+      plainText += '\n';
+      lastNodeWasBlock = true;
+      return;
+    }
+    
+    // If this is a text node, add its value
+    if (node.type === 'text') {
+      plainText += node.value;
+      lastNodeWasBlock = false;
+    }
+    
+    // If the node has children, process them
+    if (node.children && Array.isArray(node.children)) {
+      for (const child of node.children) {
+        extractText(child);
+      }
+    }
+    
+    // Add a newline after certain block elements
+    if (isBlockElement) {
+      plainText += '\n';
+      lastNodeWasBlock = true;
+    }
+  }
+  
+  // Process the root node
+  extractText(hast);
+  
+  // Clean up excessive whitespace while preserving paragraph structure
+  return plainText
+    .replace(/\n{3,}/g, '\n\n')  // Replace excessive newlines with double newlines
+    .replace(/[ \t]+/g, ' ')     // Replace multiple spaces/tabs with a single space
+    .trim();                     // Trim leading/trailing whitespace
+}

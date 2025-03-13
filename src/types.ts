@@ -13,9 +13,11 @@ export namespace Metamark {
         fileName: string;
         slug: string;
         firstParagraphText: string;
+        plain: string;
         frontmatter: Record<string, any>;
         html: string;
         toc: TocItem[];
+        originalFilePath: string; //useful for debugging + referencing
       }
 
       export interface ProcessOptions {
@@ -68,6 +70,8 @@ export namespace Metamark {
          * ```
          */
         toLinkBuilderOpts?: ToLinkBuilderOpts;
+        notePathPrefix?: string;
+        assetPathPrefix?: string; // WIP
       }
 
       export type FilePathAllowSetBuilder = (dirPath: string) => Set<string>;
@@ -79,6 +83,10 @@ export namespace Metamark {
       export type ToLinkBuilderOpts = {
         filePathAllowSet: Set<string>;
         toSlug: (s: string) => string;
+          /**
+         * The prefix to use for links. If notePathPrefix is provided in ProcessOptions,
+         * it will override the default '/content'
+         */
         prefix: string;
       };
 
