@@ -30,7 +30,7 @@ export function obsidianVaultProcess(
   // handle options
   const filePathAllowSet =
     opts?.filePathAllowSetBuilder?.(dirPath) ??
-    defaultFilePathAllowSetBuilder(dirPath);
+    lib.obsidian.defaultFilePathAllowSetBuilder(dirPath);
 
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
@@ -93,31 +93,4 @@ const unifiedProcessorBuilder: Metamark.Obsidian.Vault.UnifiedProcessorBuilder =
         })
         .use(rehypeStringify)
     );
-  };
-
-/**
- * This function is the default implementation of the "allow set" builder. It
- * takes the dirpath and constructs from is a `Set<string>` that represents the
- * "allow set", which is the set of files that are considered public, and viable
- * to be linked to in other notes.
- */
-const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
-  (dirPath) => {
-    const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
-
-    const filePathAllowSet = new Set<string>();
-
-    dirEntries.forEach((dirEntry) => {
-      if (dirEntry.isFile()) {
-        const filePath = path.join(dirPath, dirEntry.name);
-        const raw = fs.readFileSync(filePath, "utf8");
-        const { data: frontmatter } = matter(raw);
-
-        if (!!frontmatter?.public) {
-          filePathAllowSet.add(filePath);
-        }
-      }
-    });
-
-    return filePathAllowSet;
   };
