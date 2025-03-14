@@ -1,8 +1,7 @@
-import fs from "node:fs";
-import path from "node:path";
 import matter from "gray-matter";
-import { Metamark } from "../../types";
+import fs from "node:fs";
 import * as lib from "../../lib";
+import { Metamark } from "../../types";
 
 /**
  * This function is the default implementation of the "allow set" builder. It
