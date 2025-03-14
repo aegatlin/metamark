@@ -86,6 +86,17 @@ declare namespace Metamark {
     }
 }
 
+declare function toSlug(s: string): string;
+declare function getFileName(filePath: string): string;
+declare function getFrontmatterAndMd(filePath: string): {
+    md: string;
+    frontmatter: {
+        [key: string]: any;
+    };
+};
+declare function jsonStringify(o: any): string;
+declare function writeToFileSync(filePath: string, content: string): void;
+
 declare function obsidianVaultProcess(dirPath: string, opts?: Metamark.Obsidian.Vault.ProcessOptions): Metamark.Obsidian.Vault.FileData[];
 
 declare const metamark: {
@@ -95,16 +106,11 @@ declare const metamark: {
         };
     };
     utility: {
-        toSlug(s: string): string;
-        getFileName(filePath: string): string;
-        getFrontmatterAndMd(filePath: string): {
-            md: string;
-            frontmatter: {
-                [key: string]: any;
-            };
-        };
-        jsonStringify(o: any): string;
-        writeToFileSync(filePath: string, content: string): void;
+        toSlug: typeof toSlug;
+        getFileName: typeof getFileName;
+        getFrontmatterAndMd: typeof getFrontmatterAndMd;
+        jsonStringify: typeof jsonStringify;
+        writeToFileSync: typeof writeToFileSync;
     };
 };
 
