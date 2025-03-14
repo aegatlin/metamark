@@ -10,7 +10,11 @@ const metamark = {
     },
   },
   utility: {
-    ...lib.utility,
+    toSlug: lib.utility.toSlug,
+    getFileName: lib.utility.getFileName,
+    getFrontmatterAndMd: lib.utility.getFrontmatterAndMd,
+    jsonStringify: lib.utility.jsonStringify,
+    writeToFileSync: lib.utility.writeToFileSync,
   },
 };
 
