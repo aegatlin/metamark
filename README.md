@@ -37,6 +37,9 @@ to learn more.
 
 ## Publishing
 
+The `package.json` points to the `dist/` folder for all its exports, types, etc.
+So you will need to build and commit the build before publishing.
+
 `npm version patch` will bump the version in `package.json` and create a new git
 commit and git tag for that version. `git push` will push the commits to
 remote, but you need to also run `git push --tags` to push the new tags to

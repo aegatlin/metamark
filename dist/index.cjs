@@ -28,11 +28,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  default: () => src_default
+var index_exports = {};
+__export(index_exports, {
+  default: () => index_default
 });
-module.exports = __toCommonJS(src_exports);
+module.exports = __toCommonJS(index_exports);
 
 // src/lib/hast.ts
 var hast_exports = {};
@@ -93,6 +93,26 @@ function getFirstParagraphText(mdastRoot) {
   return paragraph ? (0, import_mdast_util_to_string.toString)(paragraph) : void 0;
 }
 
+// src/lib/obsidian/index.ts
+var obsidian_exports = {};
+__export(obsidian_exports, {
+  defaultFilePathAllowSetBuilder: () => defaultFilePathAllowSetBuilder
+});
+var import_gray_matter = __toESM(require("gray-matter"), 1);
+var import_node_fs = __toESM(require("fs"), 1);
+var defaultFilePathAllowSetBuilder = (dirPath) => {
+  const filePaths = utility_exports.traverseVault(dirPath);
+  const filePathAllowSet = /* @__PURE__ */ new Set();
+  filePaths.forEach((filePath) => {
+    const raw = import_node_fs.default.readFileSync(filePath, "utf8");
+    const { data: frontmatter } = (0, import_gray_matter.default)(raw);
+    if (!!frontmatter.public) {
+      filePathAllowSet.add(filePath);
+    }
+  });
+  return filePathAllowSet;
+};
+
 // src/lib/utility.ts
 var utility_exports = {};
 __export(utility_exports, {
@@ -100,11 +120,12 @@ __export(utility_exports, {
   getFrontmatterAndMd: () => getFrontmatterAndMd,
   jsonStringify: () => jsonStringify,
   toSlug: () => toSlug,
+  traverseVault: () => traverseVault,
   writeToFileSync: () => writeToFileSync
 });
 var import_slugify = __toESM(require("@sindresorhus/slugify"), 1);
-var import_gray_matter = __toESM(require("gray-matter"), 1);
-var import_node_fs = __toESM(require("fs"), 1);
+var import_gray_matter2 = __toESM(require("gray-matter"), 1);
+var import_node_fs2 = __toESM(require("fs"), 1);
 var import_node_path = __toESM(require("path"), 1);
 function toSlug(s) {
   return (0, import_slugify.default)(s, { decamelize: false });
@@ -114,8 +135,8 @@ function getFileName(filePath) {
   return name;
 }
 function getFrontmatterAndMd(filePath) {
-  const raw = import_node_fs.default.readFileSync(filePath, "utf8");
-  const { content, data } = (0, import_gray_matter.default)(raw);
+  const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
+  const { content, data } = (0, import_gray_matter2.default)(raw);
   return {
     md: content,
     frontmatter: data
@@ -125,12 +146,29 @@ function jsonStringify(o) {
   return JSON.stringify(o, null, 2);
 }
 function writeToFileSync(filePath, content) {
-  import_node_fs.default.writeFileSync(filePath, content, "utf8");
+  import_node_fs2.default.writeFileSync(filePath, content, "utf8");
+}
+function traverseVault(vaultDirPath) {
+  return traverseDirectoryRecursively(vaultDirPath);
+}
+function traverseDirectoryRecursively(dirPath) {
+  const dirEntries = import_node_fs2.default.readdirSync(dirPath, { withFileTypes: true });
+  const collection = [];
+  dirEntries.forEach((dirEntry) => {
+    const entryPath = import_node_path.default.join(dirEntry.parentPath, dirEntry.name);
+    if (dirEntry.isFile()) {
+      collection.push(entryPath);
+    } else if (dirEntry.isDirectory()) {
+      const subCollection = traverseDirectoryRecursively(entryPath);
+      collection.push(...subCollection);
+    }
+  });
+  return collection;
 }
 
 // src/obsidian.vault.process.ts
 var import_slugify2 = __toESM(require("@sindresorhus/slugify"), 1);
-var import_gray_matter2 = __toESM(require("gray-matter"), 1);
+var import_gray_matter3 = __toESM(require("gray-matter"), 1);
 
 // node_modules/highlight.js/es/languages/elixir.js
 function elixir(hljs) {
@@ -12813,7 +12851,7 @@ var grammars = {
 };
 
 // src/obsidian.vault.process.ts
-var import_node_fs2 = __toESM(require("fs"), 1);
+var import_node_fs3 = __toESM(require("fs"), 1);
 var import_node_path2 = __toESM(require("path"), 1);
 var import_rehype_autolink_headings = __toESM(require("rehype-autolink-headings"), 1);
 var import_rehype_external_links = __toESM(require("rehype-external-links"), 1);
@@ -12959,11 +12997,11 @@ var Regex = {
 
 // src/obsidian.vault.process.ts
 function obsidianVaultProcess(dirPath, opts) {
-  const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? defaultFilePathAllowSetBuilder(dirPath);
+  const filePathAllowSet = opts?.filePathAllowSetBuilder?.(dirPath) ?? obsidian_exports.defaultFilePathAllowSetBuilder(dirPath);
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
-      toSlug: src_default.utility.toSlug,
+      toSlug: index_default.utility.toSlug,
       prefix: "/content"
     }
   );
@@ -12971,8 +13009,8 @@ function obsidianVaultProcess(dirPath, opts) {
   const pages = [];
   for (const filePath of filePathAllowSet) {
     const { name: fileName } = import_node_path2.default.parse(filePath);
-    const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
-    const { content: md, data: frontmatter } = (0, import_gray_matter2.default)(raw);
+    const raw = import_node_fs3.default.readFileSync(filePath, "utf8");
+    const { content: md, data: frontmatter } = (0, import_gray_matter3.default)(raw);
     const mdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();
     const file = {
@@ -12996,21 +13034,6 @@ var unifiedProcessorBuilder = ({ toLink }) => {
     }
   }).use(import_rehype_stringify.default);
 };
-var defaultFilePathAllowSetBuilder = (dirPath) => {
-  const dirEntries = import_node_fs2.default.readdirSync(dirPath, { withFileTypes: true });
-  const filePathAllowSet = /* @__PURE__ */ new Set();
-  dirEntries.forEach((dirEntry) => {
-    if (dirEntry.isFile()) {
-      const filePath = import_node_path2.default.join(dirPath, dirEntry.name);
-      const raw = import_node_fs2.default.readFileSync(filePath, "utf8");
-      const { data: frontmatter } = (0, import_gray_matter2.default)(raw);
-      if (!!frontmatter?.public) {
-        filePathAllowSet.add(filePath);
-      }
-    }
-  });
-  return filePathAllowSet;
-};
 
 // src/index.ts
 var metamark = {
@@ -13020,7 +13043,11 @@ var metamark = {
     }
   },
   utility: {
-    ...utility_exports
+    toSlug: utility_exports.toSlug,
+    getFileName: utility_exports.getFileName,
+    getFrontmatterAndMd: utility_exports.getFrontmatterAndMd,
+    jsonStringify: utility_exports.jsonStringify,
+    writeToFileSync: utility_exports.writeToFileSync
   }
 };
-var src_default = metamark;
+var index_default = metamark;
