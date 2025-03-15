@@ -137,7 +137,6 @@ function traverseDirectoryRecursively(dirPath) {
 }
 
 // src/obsidian.vault.process.ts
-import slugify2 from "@sindresorhus/slugify";
 import matter3 from "gray-matter";
 
 // node_modules/highlight.js/es/languages/elixir.js
@@ -12971,7 +12970,7 @@ function obsidianVaultProcess(dirPath, opts) {
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
-      toSlug: index_default.utility.toSlug,
+      toSlug: utility_exports.toSlug,
       prefix: "/content"
     }
   );
@@ -12985,7 +12984,7 @@ function obsidianVaultProcess(dirPath, opts) {
     const htmlString = processor.processSync(md).toString();
     const file = {
       fileName,
-      slug: slugify2(fileName, { decamelize: false }),
+      slug: utility_exports.toSlug(fileName),
       frontmatter,
       firstParagraphText: mdast_exports.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
