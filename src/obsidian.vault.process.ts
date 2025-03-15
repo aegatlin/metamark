@@ -1,4 +1,3 @@
-import slugify from "@sindresorhus/slugify";
 import matter from "gray-matter";
 import elixir from "highlight.js/lib/languages/elixir";
 import { common as commonLanguagesRecord } from "lowlight";
@@ -18,7 +17,6 @@ import { remarkObsidianLink } from "remark-obsidian-link";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import m from "./";
 import * as lib from "./lib";
 import { toLinkBuilder } from "./obsidian.vault.toLinkBuilder";
 import { Metamark } from "./types";
@@ -35,7 +33,7 @@ export function obsidianVaultProcess(
   const toLink = toLinkBuilder(
     opts?.toLinkBuilderOpts ?? {
       filePathAllowSet,
-      toSlug: m.utility.toSlug,
+      toSlug: lib.utility.toSlug,
       prefix: "/content",
     },
   );
@@ -55,7 +53,7 @@ export function obsidianVaultProcess(
 
     const file: Metamark.Obsidian.Vault.FileData = {
       fileName,
-      slug: slugify(fileName, { decamelize: false }),
+      slug: lib.utility.toSlug(fileName),
       frontmatter,
       firstParagraphText: lib.mdast.getFirstParagraphText(mdastRoot) ?? "",
       html: htmlString,
