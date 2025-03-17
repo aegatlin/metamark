@@ -1,9 +1,12 @@
-import { Root as HastRoot } from "hast";
-import { Root as MdastRoot } from "mdast";
+import { Root as _HastRoot } from "hast";
+import { Root as _MdastRoot } from "mdast";
 import { Link, ToLink, WikiLink as _WikiLink } from "remark-obsidian-link";
 import { Processor } from "unified";
 
 export namespace Metamark {
+  export type MdastRoot = _MdastRoot;
+  export type HastRoot = _HastRoot;
+
   export type MdastLink = Link;
   export type WikiLink = _WikiLink;
 
