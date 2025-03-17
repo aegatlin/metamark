@@ -1,11 +1,6 @@
 import { expect, test } from "vitest";
 import * as lib from "../lib";
 
-function setup() {
-  const filePath = "./test/testVault/Test File.md";
-  return { filePath };
-}
-
 test("toSlug", () => {
   const actualOf = (fileName: string) => lib.utility.toSlug(fileName);
 
