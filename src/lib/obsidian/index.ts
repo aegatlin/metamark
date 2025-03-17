@@ -1,5 +1,6 @@
 import matter from "gray-matter";
 import fs from "node:fs";
+import path from "node:path";
 import * as lib from "../../lib";
 import { Metamark } from "../../types";
 
@@ -11,7 +12,7 @@ import { Metamark } from "../../types";
  */
 export const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAllowSetBuilder =
   (dirPath) => {
-    const filePaths = lib.utility.traverseVault(dirPath);
+    const filePaths = lib.obsidian.traverseVault(dirPath);
     const filePathAllowSet = new Set<string>();
 
     filePaths.forEach((filePath) => {
@@ -24,3 +25,28 @@ export const defaultFilePathAllowSetBuilder: Metamark.Obsidian.Vault.FilePathAll
 
     return filePathAllowSet;
   };
+
+/**
+ * collects filePaths in a flat string array
+ */
+export function traverseVault(vaultDirPath: string): string[] {
+  return traverseDirectoryRecursively(vaultDirPath);
+}
+
+function traverseDirectoryRecursively(dirPath: string): string[] {
+  const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
+  const collection: string[] = [];
+
+  dirEntries.forEach((dirEntry) => {
+    const entryPath = path.join(dirEntry.parentPath, dirEntry.name);
+
+    if (dirEntry.isFile()) {
+      collection.push(entryPath);
+    } else if (dirEntry.isDirectory()) {
+      const subCollection = traverseDirectoryRecursively(entryPath);
+      collection.push(...subCollection);
+    }
+  });
+
+  return collection;
+}

@@ -28,28 +28,3 @@ export function jsonStringify(o: any): string {
 export function writeToFileSync(filePath: string, content: string) {
   fs.writeFileSync(filePath, content, "utf8");
 }
-
-/**
- * collects filePaths in a flat string array
- */
-export function traverseVault(vaultDirPath: string): string[] {
-  return traverseDirectoryRecursively(vaultDirPath);
-}
-
-function traverseDirectoryRecursively(dirPath: string): string[] {
-  const dirEntries = fs.readdirSync(dirPath, { withFileTypes: true });
-  const collection: string[] = [];
-
-  dirEntries.forEach((dirEntry) => {
-    const entryPath = path.join(dirEntry.parentPath, dirEntry.name);
-
-    if (dirEntry.isFile()) {
-      collection.push(entryPath);
-    } else if (dirEntry.isDirectory()) {
-      const subCollection = traverseDirectoryRecursively(entryPath);
-      collection.push(...subCollection);
-    }
-  });
-
-  return collection;
-}
