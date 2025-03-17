@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import * as testlib from "../../../test/testlib";
-import * as lib from "../../lib";
+import * as testlib from "../../test/testlib";
+import * as lib from ".";
 
 describe("defaultFilePathAllowSetBuilder", () => {
   test("flat file structure", () => {
