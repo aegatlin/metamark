@@ -1,8 +1,6 @@
-import matter from "gray-matter";
 import elixir from "highlight.js/lib/languages/elixir";
 import { common as commonLanguagesRecord } from "lowlight";
 import { Root as MdastRoot } from "mdast";
-import fs from "node:fs";
 import path from "node:path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeExternalLinks from "rehype-external-links";
@@ -45,8 +43,7 @@ export function obsidianVaultProcess(
 
   for (const filePath of filePathAllowSet) {
     const { name: fileName } = path.parse(filePath);
-    const raw = fs.readFileSync(filePath, "utf8");
-    const { content: md, data: frontmatter } = matter(raw);
+    const { frontmatter, md } = lib.obsidian.getFrontmatterAndMd(filePath);
 
     const mdastRoot: MdastRoot = processor.parse(md);
     const htmlString = processor.processSync(md).toString();

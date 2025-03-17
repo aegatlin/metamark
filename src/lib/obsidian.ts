@@ -50,3 +50,12 @@ function traverseDirectoryRecursively(dirPath: string): string[] {
 
   return collection;
 }
+
+export function getFrontmatterAndMd(filePath: string) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const { content, data } = matter(raw);
+  return {
+    md: content,
+    frontmatter: data,
+  };
+}

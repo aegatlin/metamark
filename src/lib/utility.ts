@@ -12,15 +12,6 @@ export function getFileName(filePath: string): string {
   return name;
 }
 
-export function getFrontmatterAndMd(filePath: string) {
-  const raw = fs.readFileSync(filePath, "utf8");
-  const { content, data } = matter(raw);
-  return {
-    md: content,
-    frontmatter: data,
-  };
-}
-
 export function jsonStringify(o: any): string {
   return JSON.stringify(o, null, 2);
 }

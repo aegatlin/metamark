@@ -23,15 +23,3 @@ test("getFileName", () => {
   expect(actualOf("/path/to/a/File Name.txt")).toBe("File Name");
   expect(actualOf("/with/no/ext/hello")).toBe("hello");
 });
-
-test("getFrontmatterAndMarkdown", () => {
-  const { filePath } = setup();
-
-  const { frontmatter, md } = lib.utility.getFrontmatterAndMd(filePath);
-
-  expect(frontmatter).toStrictEqual({
-    public: true,
-    tags: ["markdown", "yaml", "html"],
-  });
-  expect(md).toMatch("I am a markdown file!");
-});

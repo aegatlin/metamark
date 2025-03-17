@@ -12,7 +12,7 @@ const metamark = {
   utility: {
     toSlug: lib.utility.toSlug,
     getFileName: lib.utility.getFileName,
-    getFrontmatterAndMd: lib.utility.getFrontmatterAndMd,
+    getFrontmatterAndMd: lib.obsidian.getFrontmatterAndMd,
     jsonStringify: lib.utility.jsonStringify,
     writeToFileSync: lib.utility.writeToFileSync,
   },
